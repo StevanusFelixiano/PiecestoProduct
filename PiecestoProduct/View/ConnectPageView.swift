@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ConnectPageView: View {
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("isAppleHealthConnected") private var isAppleHealthConnected = false
     
     var body: some View {
@@ -59,10 +60,18 @@ struct ConnectPageView: View {
                 } label: {
                     Text("Add Manually")
                         .font(.headline)
-                        .foregroundStyle(Color(red: 0.84, green: 0.47, blue: 0.49))
+                        .foregroundStyle(
+                            colorScheme == .dark
+                            ? Color(red: 1.0, green: 0.62, blue: 0.68)
+                            : Color(red: 0.84, green: 0.47, blue: 0.49)
+                        )
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color(red: 0.84, green: 0.47, blue: 0.49).opacity(0.15))
+                        .background(
+                            colorScheme == .dark
+                            ? Color(red: 0.28, green: 0.17, blue: 0.19)
+                            : Color(red: 0.84, green: 0.47, blue: 0.49).opacity(0.15)
+                        )
                         .clipShape(Capsule())
                 }
             }
