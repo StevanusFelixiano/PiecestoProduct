@@ -11,7 +11,9 @@ import SwiftUI
 struct PiecestoProductApp: App {
     var body: some Scene {
         WindowGroup {
-            TabBarView()
+            AppThemeManager {
+                ConnectPageView()
+            }
         }
     }
 }
