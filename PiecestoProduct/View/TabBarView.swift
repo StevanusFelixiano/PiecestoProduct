@@ -9,6 +9,12 @@ import SwiftUI
 
 struct TabBarView: View {
     var body: some View {
+        Button("Settings") {
+            // Action will be added later
+        }
+        .buttonStyle(.borderedProminent)
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .padding(.trailing, 20)
         TabView {
             HomePageView()
                 .tabItem {
