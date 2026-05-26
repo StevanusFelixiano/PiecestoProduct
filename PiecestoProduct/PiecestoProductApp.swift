@@ -12,7 +12,7 @@ struct PiecestoProductApp: App {
     var body: some Scene {
         WindowGroup {
             AppThemeManager {
-                ConnectPageView()
+                RootView()
             }
         }
     }

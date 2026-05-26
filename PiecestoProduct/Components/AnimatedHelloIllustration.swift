@@ -22,7 +22,6 @@ struct AnimatedHelloIllustration: View {
     
     var body: some View {
         ZStack {
-            // Soft glow for dark mode, soft blob for light mode
             if isDark {
                 Circle()
                     .fill(Color(red: 0.95, green: 0.42, blue: 0.58).opacity(0.16))

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct HomePageView: View {
+    @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
     var body: some View {
         VStack(alignment: .center){
             Text("Hi, Sora!")

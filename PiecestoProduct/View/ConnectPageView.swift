@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ConnectPageView: View {
     @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("isAppleHealthConnected") private var isAppleHealthConnected = false
+    
+    @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
     
     var body: some View {
         VStack {
@@ -22,20 +23,18 @@ struct ConnectPageView: View {
             
             Spacer()
             
-            ZStack {
-                AnimatedHelloIllustration()
-                    .scaleEffect(1.2)
-                    .frame(width: 260, height: 260)
-            }
+            AnimatedHelloIllustration()
+                .scaleEffect(1.2)
+                .frame(width: 260, height: 260)
             
             VStack(spacing: 10) {
-                Text("We couldn’t find your sleep record yet.")
-                    .font(.title3)
-                    .fontWeight(.medium)
+                Text("Your wellbeing starts here")
+                    .font(.title2)
+                    .fontWeight(.bold)
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.center)
                 
-                Text("Connect Apple Health or add your sleep manually so we can recommend a gentle workout for today.")
+                Text("Let’s start with a gentle check-in so we can recommend workouts that match your energy and wellbeing today.")
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -45,33 +44,14 @@ struct ConnectPageView: View {
             
             VStack(spacing: 18) {
                 Button {
-                    isAppleHealthConnected = true
+                    hasCompletedInitialSetup = true
                 } label: {
-                    Text(isAppleHealthConnected ? "Apple Health Connected" : "Connect to Apple Health")
+                    Text("Get Started")
                         .font(.headline)
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .padding()
                         .background(Color(red: 0.84, green: 0.47, blue: 0.49))
-                        .clipShape(Capsule())
-                }
-                
-                Button {
-                } label: {
-                    Text("Add Manually")
-                        .font(.headline)
-                        .foregroundStyle(
-                            colorScheme == .dark
-                            ? Color(red: 1.0, green: 0.62, blue: 0.68)
-                            : Color(red: 0.84, green: 0.47, blue: 0.49)
-                        )
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            colorScheme == .dark
-                            ? Color(red: 0.28, green: 0.17, blue: 0.19)
-                            : Color(red: 0.84, green: 0.47, blue: 0.49).opacity(0.15)
-                        )
                         .clipShape(Capsule())
                 }
             }
@@ -80,11 +60,16 @@ struct ConnectPageView: View {
             
             Spacer()
         }
-        .background(Color(.systemBackground))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            colorScheme == .dark
+            ? Color(red: 0.10, green: 0.07, blue: 0.09)
+            : Color(.systemBackground)
+        )
     }
 }
 
-#Preview() {
+#Preview {
     AppThemeManager {
         ConnectPageView()
     }
