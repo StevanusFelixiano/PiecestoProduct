@@ -34,17 +34,17 @@ struct AnimatedHelloIllustration: View {
                     .blur(radius: 22)
                     .offset(x: 24, y: -10)
             } else {
-                RoundedRectangle(cornerRadius: 80)
-                    .fill(Color(red: 0.98, green: 0.88, blue: 0.84).opacity(0.65))
+                Circle()
+                    .fill(Color.white.opacity(0.38))
                     .frame(width: 190, height: 190)
-                    .rotationEffect(.degrees(-12))
-                    .offset(y: 8)
+                    .blur(radius: 6)
+                    .offset(y: 4)
                 
-                RoundedRectangle(cornerRadius: 70)
-                    .fill(Color(red: 0.93, green: 0.88, blue: 1.0).opacity(0.45))
-                    .frame(width: 165, height: 165)
-                    .rotationEffect(.degrees(18))
-                    .offset(x: 10, y: -4)
+                Circle()
+                    .fill(Color(red: 1.00, green: 0.78, blue: 0.82).opacity(0.22))
+                    .frame(width: 210, height: 210)
+                    .blur(radius: 18)
+                    .offset(x: 8, y: 4)
             }
             
             FlowerView(
@@ -117,7 +117,7 @@ struct AnimatedHelloIllustration: View {
                     .foregroundStyle(
                         isDark
                         ? Color(red: 1.0, green: 0.72, blue: 0.80)
-                        : Color(red: 0.55, green: 0.37, blue: 0.40)
+                        : Color(red: 0.62, green: 0.33, blue: 0.38)
                     )
             }
             
