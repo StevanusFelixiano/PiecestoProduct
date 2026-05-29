@@ -56,7 +56,8 @@ struct OnboardPageView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 280)
-                    .offset(x: -34, y: -40)
+                    .offset(x: -36, y: -40)
+                    .opacity(1.1)
                     .ignoresSafeArea()
                 
                 Image("BotFlower")
@@ -64,7 +65,8 @@ struct OnboardPageView: View {
                     .scaledToFit()
                     .frame(width: 280)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                    .offset(x: 35, y: 30)
+                    .offset(x: 37, y: 30)
+                    .opacity(1.1)
                     .ignoresSafeArea()
                 
                 if isDark {
@@ -92,7 +94,6 @@ struct OnboardPageView: View {
                 .allowsHitTesting(!showSettings)
             }
             .padding(.horizontal, 28)
-            .padding(.top, 20)
             Spacer()
                 .frame(height: 80)
             AnimatedHelloIllustration()
@@ -119,7 +120,7 @@ struct OnboardPageView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
             }
-            .padding(.top, 20)
+            .padding(.top, 10)
             
             VStack(spacing: 18) {
                 Button {
