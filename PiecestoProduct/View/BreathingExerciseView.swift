@@ -24,7 +24,7 @@ struct BreathingExerciseView: View {
     private var formattedTime: String {
         let minutes = remainingSeconds / 60
         let seconds = remainingSeconds % 60
-        return String(format: "%02d.%02d", minutes, seconds)
+        return String(format: "%02d:%02d", minutes, seconds)
     }
     
     var body: some View {
@@ -44,7 +44,7 @@ struct BreathingExerciseView: View {
                 SettingsPopoverView()
                     .frame(width: 280)
                     .padding(.trailing, 28)
-                    .padding(.top, 20)
+                    .padding(.top, 36)
                     .transition(
                         .scale(scale: 0.92, anchor: .topTrailing)
                         .combined(with: .opacity)
@@ -52,6 +52,7 @@ struct BreathingExerciseView: View {
                     .zIndex(30)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onDisappear {
             timer?.invalidate()
             timer = nil
@@ -60,16 +61,7 @@ struct BreathingExerciseView: View {
     
     private var mainContent: some View {
         ZStack {
-            Image("MainBackground")
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-            
-            if isDark {
-                Color(red: 0.10, green: 0.07, blue: 0.09)
-                    .opacity(0.88)
-                    .ignoresSafeArea()
-            }
+            backgroundLayer
             
             VStack {
                 topBar
@@ -78,7 +70,7 @@ struct BreathingExerciseView: View {
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(
                         isDark
-                        ? Color(red: 1.00, green: 0.84, blue: 0.86)
+                        ? Color.white.opacity(0.92)
                         : Color(red: 0.32, green: 0.25, blue: 0.20)
                     )
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -94,11 +86,25 @@ struct BreathingExerciseView: View {
                 } label: {
                     Image(systemName: isRunning ? "pause.fill" : "play.fill")
                         .font(.system(size: 48, weight: .bold))
-                        .foregroundStyle(Color(red: 0.36, green: 0.28, blue: 0.20))
+                        .foregroundStyle(
+                            isDark
+                            ? Color(red: 0.92, green: 0.42, blue: 0.56)
+                            : Color(red: 0.36, green: 0.28, blue: 0.20)
+                        )
                         .frame(width: 108, height: 108)
-                        .background(Color.white.opacity(0.78))
+                        .background(
+                            isDark
+                            ? Color.white.opacity(0.90)
+                            : Color.white.opacity(0.78)
+                        )
                         .clipShape(Circle())
-                        .shadow(color: .black.opacity(0.08), radius: 10, y: 6)
+                        .shadow(
+                            color: isDark
+                            ? Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.28)
+                            : .black.opacity(0.08),
+                            radius: 12,
+                            y: 6
+                        )
                 }
                 .padding(.top, 36)
                 
@@ -106,7 +112,7 @@ struct BreathingExerciseView: View {
                     .font(.system(size: 26, weight: .regular))
                     .foregroundStyle(
                         isDark
-                        ? Color(red: 0.88, green: 0.76, blue: 0.77)
+                        ? Color.white.opacity(0.78)
                         : Color(red: 0.32, green: 0.25, blue: 0.20)
                     )
                     .padding(.top, 22)
@@ -120,10 +126,16 @@ struct BreathingExerciseView: View {
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 150, height: 52)
-                        .background(Color(red: 250/255, green: 154/255, blue: 138/255))
+                        .background(
+                            isDark
+                            ? Color(red: 0.82, green: 0.43, blue: 0.52)
+                            : Color(red: 250/255, green: 154/255, blue: 138/255)
+                        )
                         .clipShape(Capsule())
                         .shadow(
-                            color: Color(red: 250/255, green: 154/255, blue: 138/255).opacity(0.30),
+                            color: isDark
+                            ? Color(red: 0.82, green: 0.43, blue: 0.52).opacity(0.30)
+                            : Color(red: 250/255, green: 154/255, blue: 138/255).opacity(0.30),
                             radius: 10,
                             y: 5
                         )
@@ -132,7 +144,53 @@ struct BreathingExerciseView: View {
                 
                 Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private var backgroundLayer: some View {
+        GeometryReader { geometry in
+            ZStack {
+                if isDark {
+                    LinearGradient(
+                        colors: [
+                            Color(red: 0.12, green: 0.08, blue: 0.11),
+                            Color(red: 0.20, green: 0.13, blue: 0.17),
+                            Color(red: 0.10, green: 0.08, blue: 0.12)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    
+                    Circle()
+                        .fill(Color(red: 0.85, green: 0.35, blue: 0.52).opacity(0.16))
+                        .frame(width: 320, height: 320)
+                        .blur(radius: 60)
+                        .position(
+                            x: geometry.size.width * 0.18,
+                            y: geometry.size.height * 0.12
+                        )
+                    
+                    Circle()
+                        .fill(Color(red: 0.45, green: 0.72, blue: 0.88).opacity(0.12))
+                        .frame(width: 280, height: 280)
+                        .blur(radius: 55)
+                        .position(
+                            x: geometry.size.width * 0.82,
+                            y: geometry.size.height * 0.70
+                        )
+                } else {
+                    Image("MainBackground")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipped()
+                }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+        }
+        .ignoresSafeArea()
     }
     
     private var topBar: some View {
@@ -155,11 +213,11 @@ struct BreathingExerciseView: View {
                 MenuButton()
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, 16)
             .opacity(showSettings ? 0 : 1)
             .allowsHitTesting(!showSettings)
+            .padding(.horizontal, 16)
         }
-        .padding(.top, 36)
+        .padding(.top, 10)
     }
     
     private var breathingCircle: some View {
@@ -168,7 +226,12 @@ struct BreathingExerciseView: View {
                 Capsule()
                     .fill(
                         LinearGradient(
-                            colors: [
+                            colors: isDark
+                            ? [
+                                Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.85),
+                                Color(red: 0.55, green: 0.80, blue: 0.88).opacity(0.70)
+                            ]
+                            : [
                                 Color(red: 0.42, green: 0.82, blue: 0.90).opacity(0.75),
                                 Color(red: 0.88, green: 0.92, blue: 0.68).opacity(0.55)
                             ],
@@ -190,7 +253,11 @@ struct BreathingExerciseView: View {
             )
             
             Circle()
-                .fill(Color.white.opacity(0.36))
+                .fill(
+                    isDark
+                    ? Color.white.opacity(0.16)
+                    : Color.white.opacity(0.36)
+                )
                 .frame(width: 210, height: 210)
                 .blur(radius: 2)
             
@@ -198,7 +265,7 @@ struct BreathingExerciseView: View {
                 .font(.system(size: 46, weight: .semibold, design: .rounded))
                 .foregroundStyle(
                     isDark
-                    ? Color(red: 1.00, green: 0.84, blue: 0.86)
+                    ? Color.white.opacity(0.92)
                     : Color(red: 0.32, green: 0.25, blue: 0.20)
                 )
         }
