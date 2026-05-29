@@ -94,8 +94,6 @@ struct OnboardPageView: View {
             .padding(.horizontal, 28)
             .padding(.top, 20)
             
-            Spacer()
-            
             AnimatedHelloIllustration()
                 .scaleEffect(1.2)
                 .frame(width: 260, height: 260)

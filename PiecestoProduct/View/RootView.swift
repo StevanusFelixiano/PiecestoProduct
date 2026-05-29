@@ -14,7 +14,7 @@ struct RootView: View {
         if hasCompletedInitialSetup {
             HomePageView()
         } else {
-            ConnectPageView()
+            OnboardPageView()
         }
     }
 }
