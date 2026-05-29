@@ -22,17 +22,6 @@ struct WorkoutPlanView: View {
             
             VStack(alignment: .leading, spacing: 12) {
                 HStack {
-                    Button {
-                        //TODO!!!
-                    } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .background(.black.opacity(0.2))
-                            .clipShape(Circle())
-                    }
-                    
                     Spacer()
                     
                     Button {
@@ -46,7 +35,7 @@ struct WorkoutPlanView: View {
                             .clipShape(Circle())
                     }
                 }
-                .padding(.top, 60)
+                .padding(.top, 100)
                 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("WORKOUT")

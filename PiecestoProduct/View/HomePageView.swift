@@ -73,7 +73,7 @@ struct HomePageView: View {
             }
             // 3. Define your navigation destinations here at the root level
             .navigationDestination(for: String.self) { _ in
-                    WorkoutPageView()
+                    WorkoutPlanView()
             }
         }
     }
