@@ -14,7 +14,7 @@ struct BreathingExerciseView: View {
     @State private var isBreathing = false
     @State private var isRunning = false
     @State private var showSettings = false
-    @State private var remainingSeconds = 295 // 04:55
+    @State private var remainingSeconds = 300
     @State private var timer: Timer?
     
     private var isDark: Bool {

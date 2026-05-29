@@ -93,7 +93,7 @@ struct OnboardPageView: View {
                 .opacity(showSettings ? 0 : 1)
                 .allowsHitTesting(!showSettings)
             }
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 20)
             Spacer()
                 .frame(height: 80)
             AnimatedHelloIllustration()
