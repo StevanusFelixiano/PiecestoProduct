@@ -1,5 +1,5 @@
 //
-//  ConnectPageView.swift
+//  OnboardPageView.swift
 //  PiecestoProduct
 //
 //  Created by Stevanus Felixiano on 25/05/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConnectPageView: View {
+struct OnboardPageView: View {
     @Environment(\.colorScheme) private var colorScheme
     
     @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
@@ -46,10 +46,25 @@ struct ConnectPageView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
-            ZStack {
+            ZStack(alignment: .topLeading){
                 Image("Background")
                     .resizable()
                     .scaledToFill()
+                    .ignoresSafeArea()
+                
+                Image("TopFlower")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 280)
+                    .offset(x: -34, y: -40)
+                    .ignoresSafeArea()
+                
+                Image("BotFlower")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 280)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    .offset(x: 35, y: 30)
                     .ignoresSafeArea()
                 
                 if isDark {
@@ -135,6 +150,6 @@ struct ConnectPageView: View {
 
 #Preview {
     AppThemeManager {
-        ConnectPageView()
+        OnboardPageView()
     }
 }
