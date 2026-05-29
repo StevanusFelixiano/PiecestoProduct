@@ -15,12 +15,7 @@ struct HomePageView: View {
                 Text("Hi, Sora!")
                     .font(Font.title.bold())
                 Text("Let us do the gentle check, How many hours did you sleep last night?")
-                Circle()
-                    .frame(width: 200, height: 200)
-                    .overlay(
-                        Text ("Element")
-                            .foregroundColor(.white)
-                    )
+                
                 EnergyScroll()
                 
                 NavigationLink{

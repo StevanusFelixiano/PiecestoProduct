@@ -8,11 +8,19 @@
 import SwiftUI
 
 struct WorkoutPageView: View {
+    
+    @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
+    
     var body: some View {
         Text("Workout Plan")
     }
 }
 
 #Preview {
-    WorkoutPageView()
+    AppThemeManager {
+        WorkoutPageView()
+            .onAppear {
+                UserDefaults.standard.removeObject(forKey: "hasCompletedInitialSetup")
+            }
+    }
 }
