@@ -1,0 +1,261 @@
+//
+//  BreathingExerciseView.swift
+//  PiecestoProduct
+//
+//  Created by Stevanus Felixiano on 29/05/26.
+//
+
+import SwiftUI
+
+struct BreathingExerciseView: View {
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+    
+    @State private var isBreathing = false
+    @State private var isRunning = false
+    @State private var showSettings = false
+    @State private var remainingSeconds = 295 // 04:55
+    @State private var timer: Timer?
+    
+    private var isDark: Bool {
+        colorScheme == .dark
+    }
+    
+    private var formattedTime: String {
+        let minutes = remainingSeconds / 60
+        let seconds = remainingSeconds % 60
+        return String(format: "%02d.%02d", minutes, seconds)
+    }
+    
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            mainContent
+            
+            if showSettings {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                            showSettings = false
+                        }
+                    }
+                    .zIndex(20)
+                
+                SettingsPopoverView()
+                    .frame(width: 280)
+                    .padding(.trailing, 28)
+                    .padding(.top, 20)
+                    .transition(
+                        .scale(scale: 0.92, anchor: .topTrailing)
+                        .combined(with: .opacity)
+                    )
+                    .zIndex(30)
+            }
+        }
+        .onDisappear {
+            timer?.invalidate()
+            timer = nil
+        }
+    }
+    
+    private var mainContent: some View {
+        ZStack {
+            Image("MainBackground")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+            
+            if isDark {
+                Color(red: 0.10, green: 0.07, blue: 0.09)
+                    .opacity(0.88)
+                    .ignoresSafeArea()
+            }
+            
+            VStack {
+                topBar
+                
+                Text("BREATHING EXERCISE")
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(
+                        isDark
+                        ? Color(red: 1.00, green: 0.84, blue: 0.86)
+                        : Color(red: 0.32, green: 0.25, blue: 0.20)
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 28)
+                    .padding(.top, 16)
+                
+                Spacer()
+                
+                breathingCircle
+                
+                Button {
+                    toggleTimer()
+                } label: {
+                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundStyle(Color(red: 0.36, green: 0.28, blue: 0.20))
+                        .frame(width: 108, height: 108)
+                        .background(Color.white.opacity(0.78))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.08), radius: 10, y: 6)
+                }
+                .padding(.top, 36)
+                
+                Text("One breath at a time...")
+                    .font(.system(size: 26, weight: .regular))
+                    .foregroundStyle(
+                        isDark
+                        ? Color(red: 0.88, green: 0.76, blue: 0.77)
+                        : Color(red: 0.32, green: 0.25, blue: 0.20)
+                    )
+                    .padding(.top, 22)
+                
+                Button {
+                    timer?.invalidate()
+                    timer = nil
+                    dismiss()
+                } label: {
+                    Text("FINISH")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 150, height: 52)
+                        .background(Color(red: 250/255, green: 154/255, blue: 138/255))
+                        .clipShape(Capsule())
+                        .shadow(
+                            color: Color(red: 250/255, green: 154/255, blue: 138/255).opacity(0.30),
+                            radius: 10,
+                            y: 5
+                        )
+                }
+                .padding(.top, 52)
+                
+                Spacer()
+            }
+        }
+    }
+    
+    private var topBar: some View {
+        HStack {
+            Button {
+                dismiss()
+            } label: {
+                CircleIconButton(systemName: "chevron.left", size: 30)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 28)
+            
+            Spacer()
+            
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    showSettings = true
+                }
+            } label: {
+                MenuButton()
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 16)
+            .opacity(showSettings ? 0 : 1)
+            .allowsHitTesting(!showSettings)
+        }
+        .padding(.top, 36)
+    }
+    
+    private var breathingCircle: some View {
+        ZStack {
+            ForEach(0..<32, id: \.self) { index in
+                Capsule()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.42, green: 0.82, blue: 0.90).opacity(0.75),
+                                Color(red: 0.88, green: 0.92, blue: 0.68).opacity(0.55)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 18, height: 58)
+                    .offset(y: -108)
+                    .rotationEffect(.degrees(Double(index) * 360 / 32))
+            }
+            .scaleEffect(isBreathing ? 1.08 : 0.92)
+            .opacity(isRunning ? 1.0 : 0.72)
+            .animation(
+                isRunning
+                ? .easeInOut(duration: 2.4).repeatForever(autoreverses: true)
+                : .easeInOut(duration: 0.3),
+                value: isBreathing
+            )
+            
+            Circle()
+                .fill(Color.white.opacity(0.36))
+                .frame(width: 210, height: 210)
+                .blur(radius: 2)
+            
+            Text(formattedTime)
+                .font(.system(size: 46, weight: .semibold, design: .rounded))
+                .foregroundStyle(
+                    isDark
+                    ? Color(red: 1.00, green: 0.84, blue: 0.86)
+                    : Color(red: 0.32, green: 0.25, blue: 0.20)
+                )
+        }
+        .frame(width: 270, height: 270)
+    }
+    
+    private func toggleTimer() {
+        if isRunning {
+            pauseTimer()
+        } else {
+            startTimer()
+        }
+    }
+    
+    private func startTimer() {
+        isRunning = true
+        isBreathing = true
+        
+        timer?.invalidate()
+        
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { currentTimer in
+            if remainingSeconds > 0 {
+                remainingSeconds -= 1
+            } else {
+                currentTimer.invalidate()
+                timer = nil
+                isRunning = false
+                isBreathing = false
+            }
+        }
+    }
+    
+    private func pauseTimer() {
+        isRunning = false
+        isBreathing = false
+        timer?.invalidate()
+        timer = nil
+    }
+}
+
+struct CircleIconButton: View {
+    let systemName: String
+    let size: CGFloat
+    
+    var body: some View {
+        Image(systemName: systemName)
+            .font(.system(size: size, weight: .bold))
+            .foregroundStyle(.white)
+            .frame(width: 52, height: 52)
+            .background(.gray.opacity(0.8))
+            .clipShape(Circle())
+            .shadow(radius: 8)
+    }
+}
+
+#Preview {
+    AppThemeManager {
+        BreathingExerciseView()
+    }
+}
