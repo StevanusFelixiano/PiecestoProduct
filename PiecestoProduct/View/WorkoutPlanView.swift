@@ -35,7 +35,7 @@ struct WorkoutPlanView: View {
                             .clipShape(Circle())
                     }
                 }
-                .padding(.top, 100)
+                .padding(.top, 60)
                 
                 VStack(alignment: .leading, spacing: 6) {
                     Text("WORKOUT")

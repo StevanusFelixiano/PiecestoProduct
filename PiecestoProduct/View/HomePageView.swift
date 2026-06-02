@@ -22,18 +22,17 @@ struct HomePageView: View {
     }
     
     private var energyState: EnergyState {
-        if energyProgress < 0.25 { return .needingRest }
-        else if energyProgress < 0.5 { return .takingItEasy }
-        else if energyProgress < 0.75 { return .findingRhythm }
-        else { return .feelingGood }
-    }
+            if energyProgress < 0.2 { return .needingRest }
+            else if energyProgress < 0.4 { return .takingItEasy }
+            else if energyProgress < 0.6 { return .findingRhythm }
+            else if energyProgress < 0.8 { return .feelingGood }
+            else { return .energized }
+        }
     
     var body: some View {
-        // 1. Wrap your entire view hierarchy in the NavigationStack
         NavigationStack {
             ZStack(alignment: .topTrailing) {
                 
-                // 2. Your content area sits here as usual
                 contentArea
                 
                 if showSettings {
@@ -71,17 +70,15 @@ struct HomePageView: View {
                     }
                 }
             }
-            // 3. Define your navigation destinations here at the root level
             .navigationDestination(for: String.self) { _ in
                     WorkoutPlanView()
             }
         }
     }
-    
-    // 4. Now you can safely put NavigationLinks inside your contentArea
+
     private var contentArea: some View {
         ZStack{
-            VStack(alignment: .center, spacing: 20) {
+            VStack(alignment: .center, spacing: 5) {
                 HStack{
                     Text("YOUR ENERGY LEVEL")
                         .font(.system(size: 22 * textScale, weight: .bold))
@@ -122,18 +119,15 @@ struct HomePageView: View {
                     )
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
+                    .fixedSize(horizontal: false, vertical: true)
                 
                 Spacer()
                 
-                // Replace this with your actual flower image
-                Image(systemName: "sun.max.fill") // Placeholder
+                Image(energyState.imageName) // Placeholder
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 150, height: 150)
-                    .foregroundStyle(Color.blue.opacity(0.3))
-                    // Animation logic: Scales slightly based on energy level
-                    .scaleEffect(1.0 + (energyProgress * 0.2))
-                    .animation(.easeInOut, value: energyProgress)
+                    .frame(width: 250, height: 250)
+                    .animation(.spring, value: energyProgress)
                 
                 Spacer()
                 
@@ -149,12 +143,10 @@ struct HomePageView: View {
                         .ignoresSafeArea(edges: .bottom)
                     
                     VStack(spacing: 30) {
-                        // The Custom Slider
                         CurvedSlider(progress: $energyProgress)
                             .frame(height: 100)
                             .padding(.top, -20)
                         
-                        // Dynamic Text matching state
                         VStack(spacing: 12) {
                             Text(energyState.title)
                                 .font(.system(size: 18 * textScale, weight: .bold))
@@ -168,7 +160,6 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        // Hooked up NavigationLink instead of standard button
                         NavigationLink(value: "GoToWorkout") {
                             HStack {
                                 Text("WORKOUT")
@@ -193,7 +184,7 @@ struct HomePageView: View {
 // MARK: - Supporting Types & Components
 
 enum EnergyState {
-    case needingRest, takingItEasy, findingRhythm, feelingGood
+    case needingRest, takingItEasy, findingRhythm, feelingGood, energized
     
     var title: String {
         switch self {
@@ -201,6 +192,7 @@ enum EnergyState {
         case .takingItEasy: return "\"TAKING IT EASY\""
         case .findingRhythm: return "\"FINDING YOUR RHYTHM\""
         case .feelingGood: return "\"FEELING GOOD\""
+        case .energized: return "\"ENERGIZED\""
         }
     }
     
@@ -210,8 +202,19 @@ enum EnergyState {
         case .takingItEasy: return "You have some energy, but your body may still be asking for gentle movement and moments of rest."
         case .findingRhythm: return "You're moving through the day steadily. Listen to your body and take things at a pace that feels right."
         case .feelingGood: return "Your energy is showing up today. Enjoy what feels manageable while still making space for yourself."
+        case .energized: return "Your body feels ready to move and engage today. Celebrate this moment and continue treating yourself with kindness."
         }
     }
+    
+    var imageName: String {
+            switch self {
+            case .needingRest: return "FlowerEmpty"
+            case .takingItEasy: return "Flower4-5"
+            case .findingRhythm: return "Flower6-7"
+            case .feelingGood: return "Flower8-9"
+            case .energized: return "FullFlower"
+            }
+        }
 }
 
 struct CurvedSlider: View {
@@ -220,32 +223,41 @@ struct CurvedSlider: View {
     var body: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
-            let sliderWidth = width - 60
+            let sliderWidth = width - 20
             
             ZStack(alignment: .leading) {
                 CurvedTrackPath()
                     .stroke(
                         LinearGradient(
-                            colors: [Color(hex: "FFF3E0"), Color(hex: "FFF9C4"), Color(hex: "C8E6C9")],
+                            colors: [Color(hex: "C45E5E"), Color(hex: "F2EA76"), Color(hex: "80DF91")],
                             startPoint: .leading,
                             endPoint: .trailing
                         ),
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round)
+
+                        style: StrokeStyle(lineWidth: 60, lineCap: .square)
                     )
-                    .frame(width: sliderWidth, height: 60)
-                    .padding(.horizontal, 30)
+                    .frame(width: sliderWidth, height: 70)
+                    .padding(.horizontal, 10)
                 
-                // Draggable knob (Flower placeholder)
-                Image(systemName: "sparkles")
-                    .font(.system(size: 24))
-                    .foregroundStyle(.white)
+                CurvedTrackPath()
+                    .stroke(
+                        Color.white.opacity(0.6),
+                            style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                        )
+                    .frame(width: sliderWidth, height: 70)
+                    .padding(.horizontal, 10)
+                
+                Image("WhiteFlower")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
                     .shadow(radius: 3)
-                    .offset(x: 30 + (progress * sliderWidth) - 12)
-                    .offset(y: calculateYOffset(progress: progress, height: 60))
+                    .offset(x: 10 + (progress * sliderWidth) - 25)
+                    .offset(y: calculateYOffset(progress: progress))
                     .gesture(
                         DragGesture()
                             .onChanged { value in
-                                let newProgress = (value.location.x - 30) / sliderWidth
+                                let newProgress = (value.location.x - 10) / sliderWidth
                                 progress = min(max(newProgress, 0), 1)
                             }
                     )
@@ -253,10 +265,13 @@ struct CurvedSlider: View {
         }
     }
     
-    func calculateYOffset(progress: CGFloat, height: CGFloat) -> CGFloat {
-        let normalized = (progress * 2) - 1
-        let curve = 1 - (normalized * normalized)
-        return 20 - (curve * 30)
+    func calculateYOffset(progress: CGFloat) -> CGFloat {
+        let t = progress
+        
+
+        let trueY = 180 * (t * t) - 180 * t + 70
+        
+        return trueY - 35
     }
 }
 
@@ -286,7 +301,6 @@ struct CurvedTopRectangle: Shape {
         return path
     }
 }
-
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
