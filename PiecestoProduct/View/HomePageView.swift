@@ -209,9 +209,9 @@ enum EnergyState {
     var imageName: String {
             switch self {
             case .needingRest: return "FlowerEmpty"
-            case .takingItEasy: return "Flower4-5"
-            case .findingRhythm: return "Flower6-7"
-            case .feelingGood: return "Flower8-9"
+            case .takingItEasy: return "Flower2Petals"
+            case .findingRhythm: return "Flower4Petals"
+            case .feelingGood: return "Flower6Petals"
             case .energized: return "FullFlower"
             }
         }
