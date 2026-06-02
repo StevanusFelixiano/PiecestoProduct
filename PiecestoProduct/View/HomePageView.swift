@@ -10,7 +10,9 @@ import SwiftUI
 struct HomePageView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
+    @AppStorage(
+        "hasCompletedInitialSetup"
+    ) private var hasCompletedInitialSetup = false
     @AppStorage("textScale") private var textScale = 1.0
     
     @State private var showSettings = false
@@ -22,12 +24,12 @@ struct HomePageView: View {
     }
     
     private var energyState: EnergyState {
-            if energyProgress < 0.2 { return .needingRest }
-            else if energyProgress < 0.4 { return .takingItEasy }
-            else if energyProgress < 0.6 { return .findingRhythm }
-            else if energyProgress < 0.8 { return .feelingGood }
-            else { return .energized }
-        }
+        if energyProgress < 0.2 { return .needingRest }
+        else if energyProgress < 0.4 { return .takingItEasy }
+        else if energyProgress < 0.6 { return .findingRhythm }
+        else if energyProgress < 0.8 { return .feelingGood }
+        else { return .energized }
+    }
     
     var body: some View {
         NavigationStack {
@@ -39,7 +41,9 @@ struct HomePageView: View {
                     Color.black.opacity(0.001)
                         .ignoresSafeArea()
                         .onTapGesture {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                            withAnimation(
+                                .spring(response: 0.3, dampingFraction: 0.85)
+                            ) {
                                 showSettings = false
                             }
                         }
@@ -70,11 +74,16 @@ struct HomePageView: View {
                     }
                 }
             }
-            .navigationDestination(for: String.self) { _ in
-                    WorkoutPlanView()
+            .navigationDestination(for: AppRoute.self) { route in
+                        switch route {
+                        case .plan:
+                            WorkoutPlanView()
+                        case .video:
+                            WorkoutVideoView()
+                        }
+                    }
             }
         }
-    }
 
     private var contentArea: some View {
         ZStack{
@@ -90,11 +99,18 @@ struct HomePageView: View {
                     
                     Spacer()
                     Button {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
                             showSettings = true
                         }
                     } label: {
-                        MenuButton()
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundStyle(.black)
+                            .frame(width: 44, height: 44)
+                            .background(.white)
+                            .clipShape(Circle())
                     }
                     .buttonStyle(.plain)
                     .opacity(showSettings ? 0 : 1)
@@ -103,7 +119,14 @@ struct HomePageView: View {
                 .padding(20)
                 
                 Text("Hi, Sora!")
-                    .font(Font.system(size: 34 * textScale, weight: .bold, design: .rounded))
+                    .font(
+                        Font
+                            .system(
+                                size: 34 * textScale,
+                                weight: .bold,
+                                design: .rounded
+                            )
+                    )
                     .foregroundStyle(
                         isDark
                         ? Color(red: 0.86, green: 0.72, blue: 0.74)
@@ -132,18 +155,14 @@ struct HomePageView: View {
                     .offset(x: energyState.imageOffset)
                 
                 Spacer()
-                .padding(.bottom, 30)
+                    .padding(.bottom, 30)
                 
                 ZStack(alignment: .top) {
                     
+                    
                     CurvedTopRectangle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(hex: "FF8A7A"), Color(hex: "FFA896")],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
+                        .fill(isDark ? Color(hex: "FF8A7A") : Color(hex: "FA9A8A"))
+                        .ignoresSafeArea(edges: .bottom)
                         .ignoresSafeArea(edges: .bottom)
                     
                     VStack(spacing: 30) {
@@ -153,7 +172,9 @@ struct HomePageView: View {
                         
                         VStack(spacing: 12) {
                             Text(energyState.title)
-                                .font(.system(size: 18 * textScale, weight: .bold))
+                                .font(
+                                    .system(size: 18 * textScale, weight: .bold)
+                                )
                                 .tracking(1.5)
                                 .foregroundStyle(.white)
                             
@@ -168,13 +189,20 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        NavigationLink(value: "GoToWorkout") {
+                        NavigationLink(value: AppRoute.plan) {
                             HStack {
                                 Text("WORKOUT")
-                                    .font(.system(size: 14 * textScale, weight: .bold))
+                                    .font(
+                                        .system(
+                                            size: 14 * textScale,
+                                            weight: .bold
+                                        )
+                                    )
                                 Image(systemName: "chevron.down")
                             }
-                            .foregroundStyle(Color(red: 0.29, green: 0.24, blue: 0.20))
+                            .foregroundStyle(
+                                Color(red: 0.29, green: 0.24, blue: 0.20)
+                            )
                             .padding(.vertical, 12)
                             .padding(.horizontal, 24)
                             .background(Color.white)
@@ -215,24 +243,24 @@ enum EnergyState {
     }
     
     var imageName: String {
-            switch self {
-            case .needingRest: return "FlowerEmpty"
-            case .takingItEasy: return "Flower2Petals"
-            case .findingRhythm: return "Flower4Petals"
-            case .feelingGood: return "Flower6Petals"
-            case .energized: return "FullFlower"
-            }
+        switch self {
+        case .needingRest: return "FlowerEmpty"
+        case .takingItEasy: return "Flower2Petals"
+        case .findingRhythm: return "Flower4Petals"
+        case .feelingGood: return "Flower6Petals"
+        case .energized: return "FullFlower"
         }
+    }
     
     var imageOffset: CGFloat {
-            switch self {
-            case .needingRest: return -4 // Moves it 5 pixels to the left
-            case .takingItEasy: return 0
-            case .findingRhythm: return 0
-            case .feelingGood: return 0
-            case .energized: return 0
-            }
+        switch self {
+        case .needingRest: return -4 // Moves it 5 pixels to the left
+        case .takingItEasy: return 0
+        case .findingRhythm: return 0
+        case .feelingGood: return 0
+        case .energized: return 0
         }
+    }
 }
 
 struct CurvedSlider: View {
@@ -251,7 +279,11 @@ struct CurvedSlider: View {
                 CurvedTrackPath()
                     .stroke(
                         LinearGradient(
-                            colors: [Color(hex: "C45E5E"), Color(hex: "F2EA76"), Color(hex: "80DF91")],
+                            colors: [
+                                Color(hex: "C45E5E"),
+                                Color(hex: "F2EA76"),
+                                Color(hex: "80DF91")
+                            ],
                             startPoint: .leading,
                             endPoint: .trailing
                         ),
@@ -264,18 +296,24 @@ struct CurvedSlider: View {
                 CurvedTrackPath()
                     .stroke(
                         Color.white.opacity(0.6),
-                            style: StrokeStyle(lineWidth: 2, lineCap: .round)
-                        )
+                        style: StrokeStyle(lineWidth: 2, lineCap: .round)
+                    )
                     .frame(width: sliderWidth, height: 60)
                     .padding(.horizontal, 10)
                 
                 CurvedTrackPath()
-                    .stroke(Color(hex: "FA9A8A"), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .stroke(
+                        Color(hex: "FA9A8A"),
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
                     .frame(width: width, height: 60)
                     .offset(y: -45)
                     
                 CurvedTrackPath()
-                    .stroke(Color(hex: "F8F0E4"), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                    .stroke(
+                        Color(hex: "F8F0E4"),
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                    )
                     .frame(width: width, height: 70)
                     .offset(y: 45)
                 
@@ -284,12 +322,14 @@ struct CurvedSlider: View {
                     .scaledToFit()
                     .frame(width: 65, height: 65)
                     .shadow(radius: 3)
-                    .offset(x: (progress * sliderWidth) - 20)
+                    .offset(x: (progress * sliderWidth) - 23)
                     .offset(y: 5 + calculateYOffset(progress: progress))
                     .gesture(
                         DragGesture()
                             .onChanged { value in
-                                let newProgress = (value.location.x - 10) / sliderWidth
+                                let newProgress = (
+                                    value.location.x - 10
+                                ) / sliderWidth
                                 progress = min(max(newProgress, 0.05), 0.95)
                             }
                     )
@@ -334,18 +374,41 @@ struct CurvedTopRectangle: Shape {
 }
 extension Color {
     init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        let hex = hex.trimmingCharacters(
+            in: CharacterSet.alphanumerics.inverted
+        )
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
         let a, r, g, b: UInt64
         switch hex.count {
-        case 3: (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 3: (a, r, g, b) = (
+            255,
+            (int >> 8) * 17,
+            (int >> 4 & 0xF) * 17,
+            (int & 0xF) * 17
+        )
         case 6: (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8: (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        case 8: (a, r, g, b) = (
+            int >> 24,
+            int >> 16 & 0xFF,
+            int >> 8 & 0xFF,
+            int & 0xFF
+        )
         default: (a, r, g, b) = (1, 1, 1, 0)
         }
-        self.init(.sRGB, red: Double(r) / 255, green: Double(g) / 255, blue:  Double(b) / 255, opacity: Double(a) / 255)
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue:  Double(b) / 255,
+            opacity: Double(a) / 255
+        )
     }
+}
+
+enum AppRoute: Hashable {
+    case plan
+    case video
 }
 
 

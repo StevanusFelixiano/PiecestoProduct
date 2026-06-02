@@ -65,8 +65,23 @@ struct WorkoutVideoView: View {
                     .zIndex(30)
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar{
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        showSettings = true
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.black)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
+            }
+        }
     }
     
     private var mainContent: some View {
@@ -116,22 +131,8 @@ struct WorkoutVideoView: View {
                     title: "WORKOUT",
                     subtitle: "Mat Pilates with Julius",
                     description: "Gentle movements to help you feel stronger and lighter"
-                ),
-                flowerOffset: CGSize(width: 230, height: 110)
+                )
             )
-            
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                    showSettings = true
-                }
-            } label: {
-                MenuButton()
-            }
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
-            .padding(.trailing, 28)
-            .padding(.top, 58)
         }
     }
     

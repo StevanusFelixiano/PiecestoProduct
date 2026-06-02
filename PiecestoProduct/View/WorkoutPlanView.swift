@@ -43,17 +43,19 @@ struct WorkoutPlanView: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             mainContent
-            
+                    
             if showSettings {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
                             showSettings = false
                         }
                     }
                     .zIndex(20)
-                
+                        
                 SettingsPopoverView()
                     .frame(width: 280)
                     .padding(.trailing, 28)
@@ -65,9 +67,25 @@ struct WorkoutPlanView: View {
                     .zIndex(30)
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .toolbar(.hidden, for: .navigationBar)
+        .toolbar{
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        showSettings = true
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.black)
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
+            }
+        }
     }
+
     
     private var mainContent: some View {
         VStack(spacing: 0) {
@@ -85,9 +103,7 @@ struct WorkoutPlanView: View {
                 }
                 .padding(.horizontal, 20)
                 
-                Button {
-                    // TODO: navigate to WorkoutVideoView
-                } label: {
+                NavigationLink(value: AppRoute.video) {
                     Text("START")
                         .font(.system(size: 17 * textScale, weight: .bold))
                         .foregroundStyle(.white)
@@ -102,7 +118,6 @@ struct WorkoutPlanView: View {
                 }
                 .padding(.top, 24)
             }
-            
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -112,27 +127,13 @@ struct WorkoutPlanView: View {
     }
     
     private var headerArea: some View {
-        ZStack(alignment: .topTrailing) {
-            Header(
-                content: HeaderContent(
-                    title: "WORKOUT PLAN",
-                    subtitle: "",
-                    description: "We got u mama, leave it to us!"
-                )
+        Header(
+            content: HeaderContent(
+                title: "WORKOUT PLAN",
+                subtitle: "",
+                description: "We got u mama, leave it to us!"
             )
-            
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                    showSettings = true
-                }
-            } label: {
-                MenuButton()
-            }
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
-            .padding(.trailing, 28)
-        }
+        )
     }
     
     private var backgroundView: some View {
@@ -146,7 +147,11 @@ struct WorkoutPlanView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 200)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                .frame(
+                    maxWidth: .infinity,
+                    maxHeight: .infinity,
+                    alignment: .bottomTrailing
+                )
                 .offset(x: -208, y: 7)
                 .opacity(1.1)
                 .ignoresSafeArea()
