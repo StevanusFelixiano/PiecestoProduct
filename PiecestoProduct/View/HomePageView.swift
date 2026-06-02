@@ -59,7 +59,7 @@ struct HomePageView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 ZStack {
-                    Image("Background")
+                    Image("PlanBackground")
                         .resizable()
                         .scaledToFill()
                         .ignoresSafeArea()

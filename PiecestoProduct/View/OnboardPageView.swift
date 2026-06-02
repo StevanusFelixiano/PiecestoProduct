@@ -47,7 +47,7 @@ struct OnboardPageView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             ZStack(alignment: .topLeading){
-                Image("Background")
+                Image("OnboardBackground")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()

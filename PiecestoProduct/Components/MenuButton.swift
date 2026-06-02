@@ -10,12 +10,12 @@ import SwiftUI
 struct MenuButton: View {
     var body: some View {
         Image(systemName: "gearshape.fill")
-            .font(.system(size: 20, weight: .bold))
+            .font(.system(size: 22, weight: .bold))
             .foregroundStyle(.white)
-            .padding(7)
-            .background(.gray.opacity(0.8))
+            .frame(width: 48, height: 48)
+            .background(Color(red: 0.63, green: 0.58, blue: 0.73))
             .clipShape(Circle())
-            .shadow(radius: 8)
+            .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
     }
 }
 

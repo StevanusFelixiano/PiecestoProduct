@@ -120,25 +120,17 @@ struct WorkoutPlanView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background {
                 ZStack(alignment: .topLeading){
-                    Image("Background")
+                    Image("PlanBackground")
                         .resizable()
                         .scaledToFill()
                         .ignoresSafeArea()
                     
-                    Image("TopFlower")
+                    Image("BotLeftFlower")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 280)
-                        .offset(x: -36, y: -40)
-                        .opacity(1.1)
-                        .ignoresSafeArea()
-                    
-                    Image("BotFlower")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 280)
+                        .frame(width: 250)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                        .offset(x: 37, y: 30)
+                        .offset(x: -163, y: 10)
                         .opacity(1.1)
                         .ignoresSafeArea()
                     
