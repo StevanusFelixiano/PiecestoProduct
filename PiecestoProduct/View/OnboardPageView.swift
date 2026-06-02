@@ -10,7 +10,7 @@ import SwiftUI
 struct OnboardPageView: View {
     @Environment(\.colorScheme) private var colorScheme
     
-    @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
+    @AppStorage("hasSeenOnboard") private var hasSeenOnboard = false
     @AppStorage("textScale") private var textScale = 1.0
     
     @State private var showSettings = false
@@ -124,7 +124,7 @@ struct OnboardPageView: View {
             
             VStack(spacing: 18) {
                 Button {
-                    hasCompletedInitialSetup = true
+                    hasSeenOnboard = true
                 } label: {
                     Text("Get Started")
                         .font(.system(size: 17 * textScale, weight: .semibold))

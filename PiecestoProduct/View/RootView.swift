@@ -8,13 +8,16 @@
 import SwiftUI
 
 struct RootView: View {
+    @AppStorage("hasSeenOnboard") private var hasSeenOnboard = false
     @AppStorage("hasCompletedInitialSetup") private var hasCompletedInitialSetup = false
     
     var body: some View {
-        if hasCompletedInitialSetup {
-            HomePageView()
-        } else {
+        if !hasSeenOnboard {
             OnboardPageView()
+        } else if !hasCompletedInitialSetup {
+            AddNameView()
+        } else {
+            HomePageView()
         }
     }
 }
