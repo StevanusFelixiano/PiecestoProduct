@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AVFoundation
 
 struct BreathingExerciseView: View {
     @Environment(\.dismiss) private var dismiss
@@ -16,6 +17,8 @@ struct BreathingExerciseView: View {
     @State private var showSettings = false
     @State private var remainingSeconds = 300
     @State private var timer: Timer?
+    @State private var breathingTimer: Timer?
+    @State private var audioPlayer: AVAudioPlayer?
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -56,10 +59,27 @@ struct BreathingExerciseView: View {
         .onDisappear {
             timer?.invalidate()
             timer = nil
+            breathingTimer?.invalidate()
+            breathingTimer = nil
         }
     }
     
+    private func playBreathSound(isIn: Bool) {
+        let soundName = isIn ? "breath-in" : "breath-out"
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else { return }
+        
+        audioPlayer?.stop()
+        audioPlayer = try? AVAudioPlayer(contentsOf: url)
+        audioPlayer?.play()
+    }
+    
+    private var breathingLabel: String {
+        guard isRunning else { return "One breath at a time..." }
+        return isBreathing ? "Breathe In..." : "Breathe Out..."
+    }
+    
     private var mainContent: some View {
+        
         ZStack {
             backgroundLayer
             
@@ -108,13 +128,14 @@ struct BreathingExerciseView: View {
                 }
                 .padding(.top, 36)
                 
-                Text("One breath at a time...")
+                Text(breathingLabel)
                     .font(.system(size: 26, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.78)
                         : Color(red: 0.32, green: 0.25, blue: 0.20)
                     )
+                    .animation(.easeInOut(duration: 0.4), value: breathingLabel)
                     .padding(.top, 22)
                 
                 Button {
@@ -220,10 +241,54 @@ struct BreathingExerciseView: View {
         .padding(.top, 10)
     }
     
+    struct Droplet: Shape {
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            
+            let width = rect.width
+            let height = rect.height
+            let midX = rect.midX
+
+            path.move(to: CGPoint(x: midX, y: 0))
+
+            path.addCurve(
+                to: CGPoint(x: midX, y: height),
+                control1: CGPoint(x: -width * 0.2, y: height * 0.3),
+                control2: CGPoint(x: midX - width * 0.5, y: height)
+            )
+            
+            path.addCurve(
+                to: CGPoint(x: midX, y: 0),
+                control1: CGPoint(x: midX + width * 0.5, y: height),
+                control2: CGPoint(x: width * 1.2, y: height * 0.3)
+            )
+            
+            path.closeSubpath()
+            return path
+        }
+    }
+    
     private var breathingCircle: some View {
         ZStack {
-            ForEach(0..<32, id: \.self) { index in
-                Capsule()
+            Circle()
+                .fill(
+                    isDark
+                    ? Color.white.opacity(0.16)
+                    : Color.white.opacity(0.36)
+                )
+                .frame(width: 210, height: 210)
+                .blur(radius: 10)
+                .scaleEffect(isBreathing ? 0.5 : 1.5)
+                .opacity(isRunning ? 0.3 : 0.5)
+                .animation(
+                    isRunning
+                    ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
+                    : .easeInOut(duration: 0.3),
+                    value: isBreathing
+                    )
+            
+            ForEach(0..<24, id: \.self) { index in
+                Droplet()
                     .fill(
                         LinearGradient(
                             colors: isDark
@@ -239,15 +304,15 @@ struct BreathingExerciseView: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 18, height: 58)
-                    .offset(y: -108)
-                    .rotationEffect(.degrees(Double(index) * 360 / 32))
+                    .frame(width: 25, height: 50)
+                    .offset(y: -120)
+                    .rotationEffect(.degrees(Double(index) * 360 / 24))
             }
-            .scaleEffect(isBreathing ? 1.08 : 0.92)
-            .opacity(isRunning ? 1.0 : 0.72)
+            .scaleEffect(isBreathing ? 0.3 : 0.8)
+            .opacity(isRunning ? 0.8 : 1)
             .animation(
                 isRunning
-                ? .easeInOut(duration: 2.4).repeatForever(autoreverses: true)
+                ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
                 : .easeInOut(duration: 0.3),
                 value: isBreathing
             )
@@ -258,8 +323,16 @@ struct BreathingExerciseView: View {
                     ? Color.white.opacity(0.16)
                     : Color.white.opacity(0.36)
                 )
-                .frame(width: 210, height: 210)
-                .blur(radius: 2)
+                .frame(width: 100, height: 210)
+                .blur(radius: 10)
+                .scaleEffect(isBreathing ? 0.5 : 1.5)
+                .opacity(isRunning ? 0.3 : 1)
+                .animation(
+                    isRunning
+                    ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
+                    : .easeInOut(duration: 0.3),
+                    value: isBreathing
+                    )
             
             Text(formattedTime)
                 .font(.system(size: 46, weight: .semibold, design: .rounded))
@@ -268,6 +341,7 @@ struct BreathingExerciseView: View {
                     ? Color.white.opacity(0.92)
                     : Color(red: 0.32, green: 0.25, blue: 0.20)
                 )
+            
         }
         .frame(width: 270, height: 270)
     }
@@ -283,9 +357,9 @@ struct BreathingExerciseView: View {
     private func startTimer() {
         isRunning = true
         isBreathing = true
+        playBreathSound(isIn: true)
         
         timer?.invalidate()
-        
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { currentTimer in
             if remainingSeconds > 0 {
                 remainingSeconds -= 1
@@ -296,6 +370,14 @@ struct BreathingExerciseView: View {
                 isBreathing = false
             }
         }
+        
+        breathingTimer?.invalidate()
+        breathingTimer = Timer.scheduledTimer(withTimeInterval: 2.8, repeats: true) { _ in
+            withAnimation(.easeInOut(duration: 2.8)) {
+                isBreathing.toggle()
+            }
+            playBreathSound(isIn: isBreathing)
+        }
     }
     
     private func pauseTimer() {
@@ -303,6 +385,8 @@ struct BreathingExerciseView: View {
         isBreathing = false
         timer?.invalidate()
         timer = nil
+        breathingTimer?.invalidate()
+        breathingTimer = nil
     }
 }
 
