@@ -79,7 +79,7 @@ struct PostExerciseView: View {
             
             VStack(spacing: 8) {
                 Text("Congrats! You already finished today’s exercise.")
-                    .font(.system(size: 18 * textScale, weight: .regular))
+                    .font(.system(size: 17 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.88)
@@ -88,7 +88,7 @@ struct PostExerciseView: View {
                     .multilineTextAlignment(.center)
                 
                 Text("We hope you’re feeling more energized after taking this time for yourself")
-                    .font(.system(size: 18 * textScale, weight: .regular))
+                    .font(.system(size: 17 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.78)

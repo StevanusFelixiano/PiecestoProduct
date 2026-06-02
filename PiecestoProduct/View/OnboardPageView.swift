@@ -111,7 +111,7 @@ struct OnboardPageView: View {
                     .multilineTextAlignment(.center)
                 
                 Text("Let’s start with a gentle check-in so we can recommend workouts that match your energy and wellbeing today.")
-                    .font(.system(size: 17 * textScale))
+                    .font(.system(size: 16 * textScale))
                     .foregroundStyle(
                         isDark
                         ? Color(red: 0.86, green: 0.72, blue: 0.74)
