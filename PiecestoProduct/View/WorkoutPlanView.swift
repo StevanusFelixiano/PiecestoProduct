@@ -152,8 +152,16 @@ struct WorkoutPlanView: View {
                 .ignoresSafeArea()
             
             if isDark {
-                Color(red: 0.10, green: 0.07, blue: 0.09)
-                    .ignoresSafeArea()
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.24, green: 0.13, blue: 0.17),
+                        Color(red: 0.18, green: 0.10, blue: 0.13),
+                        Color(red: 0.12, green: 0.08, blue: 0.10)
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
             }
         }
     }

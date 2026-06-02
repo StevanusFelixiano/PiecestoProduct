@@ -9,7 +9,24 @@ import SwiftUI
 
 struct Header: View {
     
+    @Environment(\.colorScheme) private var colorScheme
+    @AppStorage("textScale") private var textScale = 1.0
+    
     let content: HeaderContent
+    let flowerOffset: CGSize
+    
+    init(
+        content: HeaderContent,
+        flowerOffset: CGSize = CGSize(width: 230, height: 125)
+    ) {
+        self.content = content
+        self.flowerOffset = flowerOffset
+    }
+    
+    private var isDark: Bool {
+        colorScheme == .dark
+    }
+    
     private var textBottomPadding: CGFloat {
         content.subtitle.isEmpty ? 60 : 50
     }
@@ -18,21 +35,27 @@ struct Header: View {
         ZStack(alignment: .leading) {
             VStack(alignment: .leading, spacing: 6) {
                 Text(content.title)
-                    .font(.system(size: 25, weight: .bold))
+                    .font(.system(size: 25 * textScale, weight: .bold))
                     .foregroundStyle(.white)
                 
                 if !content.subtitle.isEmpty {
                     Text(content.subtitle)
-                        .font(.system(size: 20, weight: .semibold))
+                        .font(.system(size: 20 * textScale, weight: .semibold))
                         .foregroundStyle(.white)
                         .frame(maxWidth: 275, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 
                 if !content.description.isEmpty {
                     Text(content.description)
-                        .font(.system(size: 15, weight: .light))
-                        .foregroundStyle(Color(red: 0.949, green: 0.949, blue: 0.969, opacity: 1.00))
+                        .font(.system(size: 15 * textScale, weight: .light))
+                        .foregroundStyle(
+                            isDark
+                            ? Color.white.opacity(0.82)
+                            : Color(red: 0.949, green: 0.949, blue: 0.969)
+                        )
                         .frame(maxWidth: 270, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .padding(.horizontal, 24)
@@ -42,26 +65,35 @@ struct Header: View {
             Image("WhiteFlower")
                 .resizable()
                 .scaledToFit()
-                .opacity(0.3)
+                .opacity(isDark ? 0.18 : 0.3)
                 .frame(width: 260, alignment: .trailing)
-                .offset(x: 230, y: 125)
+                .offset(x: flowerOffset.width, y: flowerOffset.height)
                 .ignoresSafeArea()
         }
         .frame(height: 285)
-        .background(colourPeach)
+        .background(headerMainColor)
         .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 32, bottomTrailingRadius: 32))
         .padding(.bottom, 8)
-        .background(colourOrange)
-        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 18, bottomTrailingRadius: 18))
-        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .background(headerBottomColor)
+        .clipShape(UnevenRoundedRectangle(bottomLeadingRadius: 20, bottomTrailingRadius: 20))
+        .shadow(
+            color: isDark ? .black.opacity(0.25) : .black.opacity(0.1),
+            radius: 10,
+            x: 0,
+            y: 5
+        )
     }
     
-    private var colourPeach: Color {
-        Color(red: 250/255, green: 154/255, blue: 138/255)
+    private var headerMainColor: Color {
+        isDark
+        ? Color(red: 0.28, green: 0.15, blue: 0.20)
+        : Color(red: 250/255, green: 154/255, blue: 138/255)
     }
     
-    private var colourOrange: Color {
-        Color(red: 251/255, green: 212/255, blue: 171/255)
+    private var headerBottomColor: Color {
+        isDark
+        ? Color(red: 0.38, green: 0.22, blue: 0.28)
+        : Color(red: 251/255, green: 212/255, blue: 171/255)
     }
     
     var body: some View {
@@ -70,7 +102,22 @@ struct Header: View {
     }
 }
 
-#Preview {
+#Preview("Plan") {
+    ZStack(alignment: .top) {
+        Color.white
+            .ignoresSafeArea()
+        
+        Header(
+            content: HeaderContent(
+                title: "WORKOUT",
+                subtitle: "",
+                description: "Gentle movements to help you feel stronger and lighter"
+            )
+        )
+    }
+}
+
+#Preview("Video") {
     ZStack(alignment: .top) {
         Color.white
             .ignoresSafeArea()
