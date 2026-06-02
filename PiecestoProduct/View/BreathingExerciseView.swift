@@ -181,7 +181,7 @@ struct BreathingExerciseView: View {
                             y: geometry.size.height * 0.70
                         )
                 } else {
-                    Image("MainBackground")
+                    Image("BreathingBackground")
                         .resizable()
                         .scaledToFill()
                         .frame(width: geometry.size.width, height: geometry.size.height)

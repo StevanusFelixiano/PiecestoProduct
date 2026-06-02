@@ -130,7 +130,7 @@ struct PostExerciseView: View {
     
     private var backgroundView: some View {
         ZStack(alignment: .topLeading) {
-            Image("Background")
+            Image("OnboardBackground")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
