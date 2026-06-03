@@ -89,7 +89,7 @@ struct HomePageView: View {
         ZStack{
             VStack(alignment: .center, spacing: -3) {
                 HStack{
-                    Text("YOUR ENERGY LEVEL")
+                    Text("YOUR ENERGY TODAY")
                         .font(.system(size: 20 * textScale, weight: .bold))
                         .foregroundStyle(
                             isDark
@@ -135,7 +135,7 @@ struct HomePageView: View {
                     )
                     .padding(.bottom, 10)
 
-                Text("Let us do the gentle check, how is your energy level?")
+                Text("Let's do a quick check-in. How is your energy right now?")
                     .font(.system(size: 17 * textScale))
                     .foregroundStyle(
                         isDark

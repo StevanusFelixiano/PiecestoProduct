@@ -15,7 +15,7 @@ struct BreathingExerciseView: View {
     @State private var isBreathing = false
     @State private var isRunning = false
     @State private var showSettings = false
-    @State private var remainingSeconds = 300
+    @State private var remainingSeconds = 180
     @State private var timer: Timer?
     @State private var breathingTimer: Timer?
     @State private var audioPlayer: AVAudioPlayer?
@@ -86,7 +86,7 @@ struct BreathingExerciseView: View {
             VStack {
                 topBar
                 
-                Text("BREATHING EXERCISE")
+                Text("A MOMENT TO BREATHE")
                     .font(.system(size: 26, weight: .bold))
                     .foregroundStyle(
                         isDark

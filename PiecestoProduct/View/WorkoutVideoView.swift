@@ -85,7 +85,7 @@ struct WorkoutVideoView: View {
                         Text("Breathing Exercise")
                             .font(.system(size: 17 * textScale, weight: .semibold))
                             .foregroundStyle(.white)
-                            .frame(width: 160, height: 15)
+                            .frame(width: 200, height: 15)
                             .padding(16)
                             .background(isDark ? darkPeach : peach)
                             .clipShape(Capsule())

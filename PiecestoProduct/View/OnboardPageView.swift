@@ -110,7 +110,7 @@ struct OnboardPageView: View {
                     )
                     .multilineTextAlignment(.center)
                 
-                Text("Let’s start with a gentle check-in so we can recommend workouts that match your energy and wellbeing today.")
+                Text("Let's start with a gentle check-in, so we can recommend a routine that honors your energy and wellbeing today.")
                     .font(.system(size: 16 * textScale))
                     .foregroundStyle(
                         isDark

@@ -19,12 +19,12 @@ struct WorkoutPlanView: View {
         WorkoutPlanItem(
             iconName: "WorkoutIcon",
             title: "Mat Pilates with Julius",
-            subtitle: "We do itd for 10 minutes"
+            subtitle: "A gentle 10-minute session"
         ),
         WorkoutPlanItem(
             iconName: "BreathingIcon",
-            title: "Breathing Exercise",
-            subtitle: "We do it for 5 minutes"
+            title: "A Momen To Breathe",
+            subtitle: "A calming 3-minute pause"
         )
     ]
     
@@ -116,7 +116,7 @@ struct WorkoutPlanView: View {
                 content: HeaderContent(
                     title: "WORKOUT PLAN",
                     subtitle: "",
-                    description: "We got u mama, leave it to us!"
+                    description: "We've got you, Mama. Leave the planning to us!"
                 ),
                 flowerOffset: CGSize(width: 70, height: 120)
             )
