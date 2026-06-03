@@ -1,8 +1,8 @@
 //
-//  WorkoutPlanView.swift
+//  WorkoutVideoView.swift
 //  PiecestoProduct
 //
-//  Created by Julius Diky Ardianto on 29/05/26.
+//  Created by Stevanus Felixiano on 29/05/26.
 //
 
 import SwiftUI
@@ -67,29 +67,8 @@ struct WorkoutVideoView: View {
                     .zIndex(30)
             }
         }
-        .toolbar{
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(
-                        .spring(response: 0.3, dampingFraction: 0.85)
-                    ) {
-                        showSettings = true
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(
-                            isDark
-                            ? Color.white
-                            : Color.black
-                        )
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
     
     private var mainContent: some View {
@@ -119,13 +98,16 @@ struct WorkoutVideoView: View {
                                 y: 5
                             )
                     }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 32)
+                    .padding(.bottom, 120)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 32)
                 .padding(.bottom, 40)
             }
         }
-        .ignoresSafeArea(edges: .top)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             backgroundView
         }
@@ -138,8 +120,22 @@ struct WorkoutVideoView: View {
                     title: "WORKOUT",
                     subtitle: "Mat Pilates with Julius",
                     description: "Gentle movements to help you feel stronger and lighter"
-                )
+                ),
+                flowerOffset: CGSize(width: 80, height: 113)
             )
+            
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    showSettings = true
+                }
+            } label: {
+                MenuButton()
+            }
+            .buttonStyle(.plain)
+            .opacity(showSettings ? 0 : 1)
+            .allowsHitTesting(!showSettings)
+            .padding(.trailing, 20)
+            .padding(.top, 58)
         }
     }
     

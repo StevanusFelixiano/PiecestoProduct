@@ -90,7 +90,7 @@ struct HomePageView: View {
         ZStack{
             VStack(alignment: .center, spacing: -3) {
                 HStack{
-                    Text("YOUR ENERGY LEVEL")
+                    Text("YOUR ENERGY TODAY")
                         .font(.system(size: 20 * textScale, weight: .bold))
                         .foregroundStyle(
                             isDark
@@ -108,10 +108,11 @@ struct HomePageView: View {
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(.white)
                             .frame(width: 44, height: 44)
-                            .background(.white)
+                            .background(Color(red: 0.63, green: 0.58, blue: 0.73))
                             .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                     }
                     .buttonStyle(.plain)
                     .opacity(showSettings ? 0 : 1)
@@ -199,10 +200,8 @@ struct HomePageView: View {
                                 .padding(.horizontal, 30)
                         }
                         .animation(.easeInOut, value: energyState)
-                            
-                        Button {
-                            onWorkoutTap()
-                        } label: {
+                        
+                        NavigationLink(value: AppRoute.plan(energyState)) {
                             HStack {
                                 Text("WORKOUT")
                                     .font(

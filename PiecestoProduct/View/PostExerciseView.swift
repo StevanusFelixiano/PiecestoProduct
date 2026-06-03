@@ -83,7 +83,7 @@ struct PostExerciseView: View {
                 .opacity(isDark ? 0.85 : 1.0)
             
             VStack(spacing: 8) {
-                Text("Congrats! You already finished today’s exercise.")
+                Text("You did it! Thank you for prioritizing yourself today.")
                     .font(.system(size: 17 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
@@ -92,7 +92,7 @@ struct PostExerciseView: View {
                     )
                     .multilineTextAlignment(.center)
                 
-                Text("We hope you’re feeling more energized after taking this time for yourself")
+                Text("We hope you're feeling a bit more like yourself after taking this time for yourself")
                     .font(.system(size: 17 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark

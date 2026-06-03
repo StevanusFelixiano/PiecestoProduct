@@ -27,6 +27,8 @@ struct RootView: View {
         RootView()
             .onAppear {
                 UserDefaults.standard.removeObject(forKey: "hasCompletedInitialSetup")
+                UserDefaults.standard.removeObject(forKey: "hasSeenOnboard")
+                UserDefaults.standard.removeObject(forKey: "userName")
             }
     }
 }
