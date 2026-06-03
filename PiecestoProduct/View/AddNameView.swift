@@ -89,10 +89,12 @@ struct AddNameView: View {
             .padding(.horizontal, 20)
             
             Spacer()
+                .frame(height: 200)
             
             VStack(spacing: 18) {
                 Text("Welcome,")
                     .font(.system(size: 45 * textScale, weight: .bold))
+                    .fontDesign(.rounded)
                     .foregroundStyle(mainTextColor)
                 
                 Text("What should we call you?")

@@ -95,10 +95,10 @@ struct OnboardPageView: View {
             }
             .padding(.horizontal, 20)
             Spacer()
-                .frame(height: 80)
+                .frame(height: 85)
             AnimatedHelloIllustration()
                 .scaleEffect(1.2)
-                .frame(width: 260, height: 260)
+                .frame(width: 260, height: 230)
             
             VStack(spacing: 10) {
                 Text("Your wellbeing starts here")
@@ -120,7 +120,6 @@ struct OnboardPageView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
             }
-            .padding(.top, 10)
             
             VStack(spacing: 18) {
                 Button {
