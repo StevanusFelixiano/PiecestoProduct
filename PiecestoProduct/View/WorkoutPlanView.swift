@@ -102,6 +102,7 @@ struct WorkoutPlanView: View {
                 }
                 .padding(.top, 24)
             }
+            .padding(.top, -24)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -189,7 +190,7 @@ struct WorkoutPlanRow: View {
             Image(item.iconName)
                 .resizable()
                 .scaledToFit()
-                .frame(width: 60, height: 60)
+                .frame(width: 55, height: 55)
             
             VStack(alignment: .leading, spacing: 6) {
                 Text(item.title)
