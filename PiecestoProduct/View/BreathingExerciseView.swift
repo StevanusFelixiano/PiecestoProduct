@@ -219,10 +219,17 @@ struct BreathingExerciseView: View {
             Button {
                 dismiss()
             } label: {
-                CircleIconButton(systemName: "chevron.left", size: 30)
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 48, height: 48)
+                    .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
             }
             .buttonStyle(.plain)
             .padding(.horizontal, 28)
+            
             
             Spacer()
             
@@ -248,9 +255,9 @@ struct BreathingExerciseView: View {
             let width = rect.width
             let height = rect.height
             let midX = rect.midX
-
+            
             path.move(to: CGPoint(x: midX, y: 0))
-
+            
             path.addCurve(
                 to: CGPoint(x: midX, y: height),
                 control1: CGPoint(x: -width * 0.2, y: height * 0.3),
@@ -285,7 +292,7 @@ struct BreathingExerciseView: View {
                     ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
                     : .easeInOut(duration: 0.3),
                     value: isBreathing
-                    )
+                )
             
             ForEach(0..<24, id: \.self) { index in
                 Droplet()
@@ -332,7 +339,7 @@ struct BreathingExerciseView: View {
                     ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
                     : .easeInOut(duration: 0.3),
                     value: isBreathing
-                    )
+                )
             
             Text(formattedTime)
                 .font(.system(size: 46, weight: .semibold, design: .rounded))
