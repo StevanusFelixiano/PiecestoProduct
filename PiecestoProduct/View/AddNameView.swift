@@ -66,7 +66,35 @@ struct AddNameView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
-            backgroundView
+            ZStack(alignment: .topLeading){
+                Image("OnboardBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                    .opacity(1.5)
+                
+                Image("TopFlower")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 280)
+                    .offset(x: -36, y: -40)
+                    .opacity(1.1)
+                    .ignoresSafeArea()
+                
+                Image("BotFlower")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 280)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    .offset(x: 37, y: 30)
+                    .opacity(1.1)
+                    .ignoresSafeArea()
+                
+                if isDark {
+                    Color(red: 0.10, green: 0.07, blue: 0.09)
+                        .ignoresSafeArea()
+                }
+            }
         }
     }
     
@@ -89,10 +117,12 @@ struct AddNameView: View {
             .padding(.horizontal, 20)
             
             Spacer()
+                .frame(height: 200)
             
             VStack(spacing: 18) {
                 Text("Welcome,")
                     .font(.system(size: 45 * textScale, weight: .bold))
+                    .fontDesign(.rounded)
                     .foregroundStyle(mainTextColor)
                 
                 Text("What should we call you?")

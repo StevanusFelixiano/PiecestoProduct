@@ -70,40 +70,42 @@ struct WorkoutVideoView: View {
     }
     
     private var mainContent: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                headerArea
-                
-                VStack(alignment: .leading, spacing: 24) {
-                    videoSection
+        ZStack(alignment: .bottom) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    headerArea
                     
-                    stepsSection
-                    
-                    Button {
-                        // TODO: navigate to BreathingExerciseView
-                    } label: {
-                        Text("Breathing Exercise")
-                            .font(.system(size: 17 * textScale, weight: .semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 200, height: 15)
-                            .padding(16)
-                            .background(isDark ? darkPeach : peach)
-                            .clipShape(Capsule())
-                            .shadow(
-                                color: (isDark ? darkPeach : peach).opacity(0.30),
-                                radius: 10,
-                                y: 5
-                            )
+                    VStack(alignment: .leading, spacing: 24) {
+                        videoSection
+                        
+                        stepsSection
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 20)
+                    .padding(.horizontal, 24)
+                    .padding(.top, 32)
+                    .padding(.bottom, 120)
                 }
-                .padding(.horizontal, 24)
-                .padding(.top, 32)
-                .padding(.bottom, 40)
             }
+            .ignoresSafeArea(edges: .top)
+            
+            Button {
+                // TODO: navigate to BreathingExerciseView
+            } label: {
+                Text("Breathing Exercise")
+                    .font(.system(size: 17 * textScale, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 200, height: 15)
+                    .padding(16)
+                    .background(isDark ? darkPeach : peach)
+                    .clipShape(Capsule())
+                    .shadow(
+                        color: (isDark ? darkPeach : peach).opacity(0.30),
+                        radius: 10,
+                        y: 5
+                    )
+            }
+            .padding(.bottom, 22)
         }
-        .ignoresSafeArea(edges: .top)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             backgroundView
         }

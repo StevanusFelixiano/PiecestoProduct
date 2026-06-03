@@ -34,7 +34,7 @@ struct Header: View {
     }
     
     private var textBottomPadding: CGFloat {
-        content.subtitle.isEmpty ? 90 : 60
+        content.subtitle.isEmpty ? 50 : 60
     }
     
     private var headerSection: some View {
