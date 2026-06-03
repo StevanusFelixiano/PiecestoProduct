@@ -48,7 +48,9 @@ struct WorkoutVideoView: View {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
                             showSettings = false
                         }
                     }
@@ -68,13 +70,19 @@ struct WorkoutVideoView: View {
         .toolbar{
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
                         showSettings = true
                     }
                 } label: {
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(
+                            isDark
+                            ? Color.white
+                            : Color.black
+                        )
                         .clipShape(Circle())
                 }
                 .buttonStyle(.plain)
@@ -89,31 +97,30 @@ struct WorkoutVideoView: View {
             VStack(alignment: .leading, spacing: 0) {
                 headerArea
                 
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .center, spacing: 24) {
                     videoSection
                     
                     stepsSection
                     
-                    Button {
-                        // TODO: navigate to BreathingExerciseView
-                    } label: {
+                    NavigationLink(value: AppRoute.breathing){
                         Text("Breathing Exercise")
-                            .font(.system(size: 17 * textScale, weight: .semibold))
+                            .font(
+                                .system(size: 17 * textScale, weight: .semibold)
+                            )
                             .foregroundStyle(.white)
                             .frame(width: 160, height: 15)
                             .padding(16)
                             .background(isDark ? darkPeach : peach)
                             .clipShape(Capsule())
                             .shadow(
-                                color: (isDark ? darkPeach : peach).opacity(0.30),
+                                color: (isDark ? darkPeach : peach)
+                                    .opacity(0.30),
                                 radius: 10,
                                 y: 5
                             )
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 20)
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 20)
                 .padding(.top, 32)
                 .padding(.bottom, 40)
             }
@@ -159,45 +166,45 @@ struct WorkoutVideoView: View {
     }
     
     private var videoSection: some View {
-            ZStack {
-                Color.gray.opacity(0.2)
-                    .frame(height: 220)
-                    .cornerRadius(20)
+        ZStack {
+            Color.gray.opacity(0.2)
+                .frame(height: 220)
+                .cornerRadius(20)
                 
-                Button {
-                } label: {
-                    Image(systemName: "play.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 60, height: 60)
-                        .foregroundStyle(.white)
-                        .background(Circle().fill(.black.opacity(0.2)))
-                }
+            Button {
+            } label: {
+                Image(systemName: "play.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .foregroundStyle(.white)
+                    .background(Circle().fill(.black.opacity(0.2)))
             }
         }
+    }
         
-        private var stepsSection: some View {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("STEPS")
-                    .font(.system(size: 18 * textScale, weight: .bold))
-                    .foregroundStyle(isDark ? darkPeach : textBrown)
-                    .tracking(1.0)
+    private var stepsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("STEPS")
+                .font(.system(size: 18 * textScale, weight: .bold))
+                .foregroundStyle(isDark ? darkPeach : textBrown)
+                .tracking(1.0)
                 
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(steps.indices, id: \.self) { index in
-                        HStack(alignment: .top, spacing: 12) {
-                            Text("\(index + 1).")
-                                .fontWeight(.bold)
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(steps.indices, id: \.self) { index in
+                    HStack(alignment: .top, spacing: 12) {
+                        Text("\(index + 1).")
+                            .fontWeight(.bold)
                             
-                            Text(steps[index])
-                                .lineSpacing(4)
-                        }
-                        .font(.system(size: 16 * textScale))
-                        .foregroundStyle(isDark ? .white : textBrown.opacity(0.9))
+                        Text(steps[index])
+                            .lineSpacing(4)
                     }
+                    .font(.system(size: 16 * textScale))
+                    .foregroundStyle(isDark ? .white : textBrown.opacity(0.9))
                 }
             }
         }
+    }
 }
 
 #Preview {

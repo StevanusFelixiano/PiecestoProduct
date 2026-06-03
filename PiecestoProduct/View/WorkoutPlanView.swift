@@ -15,6 +15,8 @@ struct WorkoutPlanView: View {
     
     @State private var showSettings = false
     
+    var onBackTap: () -> Void = {}
+    
     private let workoutItems = [
         WorkoutPlanItem(
             iconName: "WorkoutIcon",
@@ -67,23 +69,6 @@ struct WorkoutPlanView: View {
                     .zIndex(30)
             }
         }
-        .toolbar{
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                        showSettings = true
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.black)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-        }
     }
 
     
@@ -127,13 +112,37 @@ struct WorkoutPlanView: View {
     }
     
     private var headerArea: some View {
-        Header(
-            content: HeaderContent(
-                title: "WORKOUT PLAN",
-                subtitle: "",
-                description: "We got u mama, leave it to us!"
+        ZStack(alignment: .topTrailing){
+            Header(
+                content: HeaderContent(
+                    title: "WORKOUT PLAN",
+                    subtitle: "",
+                    description: "We got u mama, leave it to us!"
+                )
             )
-        )
+            .onTapGesture {
+                onBackTap()
+            }
+            Button {
+                withAnimation(
+                    .spring(response: 0.3, dampingFraction: 0.85)
+                ) {
+                    showSettings = true
+                }
+            } label: {
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(.black)
+                    .frame(width: 44, height: 44)
+                    .background(.white)
+                    .clipShape(Circle())
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 60)
+            .buttonStyle(.plain)
+            .opacity(showSettings ? 0 : 1)
+            .allowsHitTesting(!showSettings)
+        }
     }
     
     private var backgroundView: some View {
