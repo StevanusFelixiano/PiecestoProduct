@@ -76,8 +76,8 @@ struct HomePageView: View {
             }
             .navigationDestination(for: AppRoute.self) { route in
                         switch route {
-                        case .plan:
-                            WorkoutPlanView()
+                        case .plan(let state):
+                            WorkoutPlanView(energyState: state)
                         case .video:
                             WorkoutVideoView()
                         }
@@ -190,7 +190,7 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        NavigationLink(value: AppRoute.plan) {
+                        NavigationLink(value: AppRoute.plan(energyState)) {
                             HStack {
                                 Text("WORKOUT")
                                     .font(
@@ -214,52 +214,6 @@ struct HomePageView: View {
                 }
                 .frame(height: 300)
             }
-        }
-    }
-}
-
-// MARK: - Supporting Types & Components
-
-enum EnergyState {
-    case needingRest, takingItEasy, findingRhythm, feelingGood, energized
-    
-    var title: String {
-        switch self {
-        case .needingRest: return "\"NEEDING REST\""
-        case .takingItEasy: return "\"TAKING IT EASY\""
-        case .findingRhythm: return "\"FINDING YOUR RHYTHM\""
-        case .feelingGood: return "\"FEELING GOOD\""
-        case .energized: return "\"ENERGIZED\""
-        }
-    }
-    
-    var description: String {
-        switch self {
-        case .needingRest: return "Your body has been carrying a lot lately. \nToday may be a day for slowing down and giving yourself extra care."
-        case .takingItEasy: return "You have some energy, but your body may still be asking for gentle movement and moments of rest."
-        case .findingRhythm: return "You're moving through the day steadily. \nListen to your body and take things at a pace that feels right."
-        case .feelingGood: return "Your energy is showing up today. \nEnjoy what feels manageable while still making space for yourself."
-        case .energized: return "Your body feels ready to move and engage today. \nCelebrate this moment and continue treating yourself with kindness."
-        }
-    }
-    
-    var imageName: String {
-        switch self {
-        case .needingRest: return "FlowerEmpty"
-        case .takingItEasy: return "Flower2Petals"
-        case .findingRhythm: return "Flower4Petals"
-        case .feelingGood: return "Flower6Petals"
-        case .energized: return "FullFlower"
-        }
-    }
-    
-    var imageOffset: CGFloat {
-        switch self {
-        case .needingRest: return -4 // Moves it 5 pixels to the left
-        case .takingItEasy: return 0
-        case .findingRhythm: return 0
-        case .feelingGood: return 0
-        case .energized: return 0
         }
     }
 }
@@ -406,12 +360,6 @@ extension Color {
         )
     }
 }
-
-enum AppRoute: Hashable {
-    case plan
-    case video
-}
-
 
 
 #Preview {
