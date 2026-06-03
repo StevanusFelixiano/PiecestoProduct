@@ -15,6 +15,8 @@ struct WorkoutPlanView: View {
     
     @State private var showSettings = false
     
+    var onBackTap: () -> Void = {}
+    
     let energyState: EnergyState
     @State private var selectedVideo: WorkoutVideo?
     
@@ -70,6 +72,7 @@ struct WorkoutPlanView: View {
     private var mainContent: some View {
         VStack(spacing: 0) {
             headerArea
+                .frame(height: 240)
             
             VStack(spacing: 34) {
                 VStack(spacing: 32) {
@@ -101,15 +104,17 @@ struct WorkoutPlanView: View {
                             .background(isDark ? darkPeach : peach)
                             .clipShape(Capsule())
                             .shadow(
-                                color: (isDark ? darkPeach : peach).opacity(0.30),
+                                color: (isDark ? darkPeach : peach)
+                                    .opacity(0.30),
                                 radius: 10,
                                 y: 5
                             )
                     }
                     .padding(.top, 24)
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.top, -24)
+            .padding(.top, 40)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -125,32 +130,46 @@ struct WorkoutPlanView: View {
                     title: "WORKOUT PLAN",
                     subtitle: "",
                     description: "We've got you, Mama. Leave the planning to us!"
-                ),
-                flowerOffset: CGSize(width: 70, height: 120)
+                )
             )
+            .frame(height: 240)
             .onTapGesture {
                 onBackTap()
             }
-            Button {
-                withAnimation(
-                    .spring(response: 0.3, dampingFraction: 0.85)
-                ) {
-                    showSettings = true
-                }
-            } label: {
-                Image(systemName: "gearshape.fill")
+            HStack{
+                Button{
+                    onBackTap()
+                } label:{
+                    Image(systemName: "chevron.left")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(.black)
                     .frame(width: 44, height: 44)
-                    .background(.white)
+                    .background(Color.white)
                     .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
+                }
+                Spacer()
+                
+                Button {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
+                        showSettings = true
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(width: 44, height: 44)
+                        .background(.white)
+                        .clipShape(Circle())
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 60)
             .buttonStyle(.plain)
             .opacity(showSettings ? 0 : 1)
             .allowsHitTesting(!showSettings)
-            .padding(.trailing, 20)
         }
     }
     
@@ -192,10 +211,10 @@ struct WorkoutPlanView: View {
 
 struct WorkoutPlanRow: View {
     let iconName: String
-        let title: String
-        let subtitle: String
-        let textScale: Double
-        let isDark: Bool
+    let title: String
+    let subtitle: String
+    let textScale: Double
+    let isDark: Bool
     
     private var textBrown: Color {
         Color(red: 0.36, green: 0.27, blue: 0.24)

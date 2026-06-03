@@ -10,13 +10,15 @@ import SwiftUI
 struct MainScrollView: View {
     @State private var isScrollDisabled = true
     
+    @State private var selectedEnergy: EnergyState = .findingRhythm
+    
     var body: some View {
         NavigationStack {
             ScrollViewReader { proxy in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
                         
-                        HomePageView(onWorkoutTap: {
+                        HomePageView(onWorkoutTap: {_ in 
                             isScrollDisabled = false
                             withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
                                 proxy.scrollTo("workout_plan_section", anchor: .top)
@@ -35,7 +37,7 @@ struct MainScrollView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                                 isScrollDisabled = false
                             }
-                        })
+                        }, energyState: selectedEnergy)
                         .id("workout_plan_section")
                         .containerRelativeFrame(.vertical, alignment: .center)
                     }
@@ -47,8 +49,8 @@ struct MainScrollView: View {
                 switch route {
                 case .home:
                     HomePageView()
-                case .plan:
-                    WorkoutPlanView()
+                case .plan (let exactEnergyState):
+                    WorkoutPlanView(energyState: exactEnergyState)
                 case .video:
                     WorkoutVideoView()
                 case .breathing:

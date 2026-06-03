@@ -21,7 +21,7 @@ struct HomePageView: View {
     
     @State private var showWorkoutPlan = false
     
-    var onWorkoutTap: () -> Void = {}
+    var onWorkoutTap: (EnergyState) -> Void = {_ in}
     var onBackTap: () -> Void = {}
     
     //    @Binding var
@@ -65,9 +65,6 @@ struct HomePageView: View {
                     )
                     .zIndex(30)
             }
-        }
-        .fullScreenCover(isPresented: $showWorkoutPlan) {
-            WorkoutPlanView()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
@@ -168,11 +165,12 @@ struct HomePageView: View {
                     CurvedTopRectangle()
                         .fill(
                             isDark ? Color(hex: "FF8A7A") : Color(
-                                hex: "FA9A8A"
+                                hex: "#FA9A8A"
                             )
                         )
                         .ignoresSafeArea(edges: .bottom)
                         .ignoresSafeArea(edges: .bottom)
+                        
                         
                     VStack(spacing: 30) {
                         CurvedSlider(progress: $energyProgress)
@@ -192,7 +190,7 @@ struct HomePageView: View {
                                 
                             Text(energyState.description)
                                 .font(.system(size: 14 * textScale))
-                                .frame(maxWidth: 320)
+                                .frame(maxWidth: energyState.descriptionWidth)
                                 .lineSpacing(3)
                                 .multilineTextAlignment(.center)
                                 .tracking(0)
@@ -201,24 +199,26 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        NavigationLink(value: AppRoute.plan(energyState)) {
+                        Button{
+                            onWorkoutTap(energyState)
+                        } label:{
                             HStack {
-                                Text("WORKOUT")
-                                    .font(
-                                        .system(
-                                            size: 14 * textScale,
-                                            weight: .bold
+                                    Text("WORKOUT")
+                                        .font(
+                                            .system(
+                                                size: 14 * textScale,
+                                                weight: .bold
+                                            )
                                         )
-                                    )
-                                Image(systemName: "chevron.down")
-                            }
-                            .foregroundStyle(
-                                Color(red: 0.29, green: 0.24, blue: 0.20)
-                            )
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 24)
-                            .background(Color.white)
-                            .clipShape(Capsule())
+                                    Image(systemName: "chevron.down")
+                                }
+                                .foregroundStyle(
+                                    Color(red: 0.29, green: 0.24, blue: 0.20)
+                                )
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 24)
+                                .background(Color.white)
+                                .clipShape(Capsule())
                         }
                         .padding(.bottom, 20)
                     }
@@ -248,50 +248,6 @@ struct HomePageView: View {
 }
 
 // MARK: - Supporting Types & Components
-
-enum EnergyState {
-    case needingRest, takingItEasy, findingRhythm, feelingGood, energized
-    
-    var title: String {
-        switch self {
-        case .needingRest: return "\"NEEDING REST\""
-        case .takingItEasy: return "\"TAKING IT EASY\""
-        case .findingRhythm: return "\"FINDING YOUR RHYTHM\""
-        case .feelingGood: return "\"FEELING GOOD\""
-        case .energized: return "\"ENERGIZED\""
-        }
-    }
-    
-    var description: String {
-        switch self {
-        case .needingRest: return "Your body has been carrying a lot lately. \nToday may be a day for slowing down and giving yourself extra care."
-        case .takingItEasy: return "You have some energy, but your body may still be asking for gentle movement and moments of rest."
-        case .findingRhythm: return "You're moving through the day steadily. \nListen to your body and take things at a pace that feels right."
-        case .feelingGood: return "Your energy is showing up today. \nEnjoy what feels manageable while still making space for yourself."
-        case .energized: return "Your body feels ready to move and engage today. \nCelebrate this moment and continue treating yourself with kindness."
-        }
-    }
-    
-    var imageName: String {
-        switch self {
-        case .needingRest: return "FlowerEmpty"
-        case .takingItEasy: return "Flower2Petals"
-        case .findingRhythm: return "Flower4Petals"
-        case .feelingGood: return "Flower6Petals"
-        case .energized: return "FullFlower"
-        }
-    }
-    
-    var imageOffset: CGFloat {
-        switch self {
-        case .needingRest: return -4 // Moves it 5 pixels to the left
-        case .takingItEasy: return 0
-        case .findingRhythm: return 0
-        case .feelingGood: return 0
-        case .energized: return 0
-        }
-    }
-}
 
 struct CurvedSlider: View {
     @Binding var progress: CGFloat
@@ -434,14 +390,6 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
-}
-
-enum AppRoute: Hashable {
-    case home
-    case plan
-    case video
-    case breathing
-    case finish
 }
 
 

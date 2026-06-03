@@ -19,7 +19,7 @@ struct Header: View {
     
     init(
         content: HeaderContent,
-        flowerOffset: CGSize = CGSize(width: 100, height: 100),
+        flowerOffset: CGSize = CGSize(width: 100, height: 100)
     ) {
         self.content = content
         self.flowerOffset = flowerOffset
@@ -92,12 +92,6 @@ struct Header: View {
                 bottomLeadingRadius: 20,
                 bottomTrailingRadius: 20
             )
-        )
-        .shadow(
-            color: isDark ? .black.opacity(0.25) : .black.opacity(0.1),
-            radius: 10,
-            x: 0,
-            y: 5
         )
     }
     
