@@ -19,7 +19,7 @@ struct WorkoutPlanView: View {
         WorkoutPlanItem(
             iconName: "WorkoutIcon",
             title: "Mat Pilates with Julius",
-            subtitle: "We do it for 10 minutes"
+            subtitle: "We do itd for 10 minutes"
         ),
         WorkoutPlanItem(
             iconName: "BreathingIcon",
