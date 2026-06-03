@@ -1,8 +1,8 @@
 //
-//  WorkoutPlanView.swift
+//  WorkoutVideoView.swift
 //  PiecestoProduct
 //
-//  Created by Julius Diky Ardianto on 29/05/26.
+//  Created by Stevanus Felixiano on 29/05/26.
 //
 
 import SwiftUI
@@ -65,23 +65,8 @@ struct WorkoutVideoView: View {
                     .zIndex(30)
             }
         }
-        .toolbar{
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                        showSettings = true
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.black)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
     
     private var mainContent: some View {
@@ -131,8 +116,22 @@ struct WorkoutVideoView: View {
                     title: "WORKOUT",
                     subtitle: "Mat Pilates with Julius",
                     description: "Gentle movements to help you feel stronger and lighter"
-                )
+                ),
+                flowerOffset: CGSize(width: 80, height: 113)
             )
+            
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    showSettings = true
+                }
+            } label: {
+                MenuButton()
+            }
+            .buttonStyle(.plain)
+            .opacity(showSettings ? 0 : 1)
+            .allowsHitTesting(!showSettings)
+            .padding(.trailing, 20)
+            .padding(.top, 58)
         }
     }
     
@@ -159,45 +158,45 @@ struct WorkoutVideoView: View {
     }
     
     private var videoSection: some View {
-            ZStack {
-                Color.gray.opacity(0.2)
-                    .frame(height: 220)
-                    .cornerRadius(20)
-                
-                Button {
-                } label: {
-                    Image(systemName: "play.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 60, height: 60)
-                        .foregroundStyle(.white)
-                        .background(Circle().fill(.black.opacity(0.2)))
-                }
+        ZStack {
+            Color.gray.opacity(0.2)
+                .frame(height: 220)
+                .cornerRadius(20)
+            
+            Button {
+            } label: {
+                Image(systemName: "play.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .foregroundStyle(.white)
+                    .background(Circle().fill(.black.opacity(0.2)))
             }
         }
-        
-        private var stepsSection: some View {
-            VStack(alignment: .leading, spacing: 16) {
-                Text("STEPS")
-                    .font(.system(size: 18 * textScale, weight: .bold))
-                    .foregroundStyle(isDark ? darkPeach : textBrown)
-                    .tracking(1.0)
-                
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(steps.indices, id: \.self) { index in
-                        HStack(alignment: .top, spacing: 12) {
-                            Text("\(index + 1).")
-                                .fontWeight(.bold)
-                            
-                            Text(steps[index])
-                                .lineSpacing(4)
-                        }
-                        .font(.system(size: 16 * textScale))
-                        .foregroundStyle(isDark ? .white : textBrown.opacity(0.9))
+    }
+    
+    private var stepsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("STEPS")
+                .font(.system(size: 18 * textScale, weight: .bold))
+                .foregroundStyle(isDark ? darkPeach : textBrown)
+                .tracking(1.0)
+            
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(steps.indices, id: \.self) { index in
+                    HStack(alignment: .top, spacing: 12) {
+                        Text("\(index + 1).")
+                            .fontWeight(.bold)
+                        
+                        Text(steps[index])
+                            .lineSpacing(4)
                     }
+                    .font(.system(size: 16 * textScale))
+                    .foregroundStyle(isDark ? .white : textBrown.opacity(0.9))
                 }
             }
         }
+    }
 }
 
 #Preview {

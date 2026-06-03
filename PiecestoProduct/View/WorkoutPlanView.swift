@@ -43,7 +43,7 @@ struct WorkoutPlanView: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             mainContent
-                    
+            
             if showSettings {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
@@ -55,7 +55,7 @@ struct WorkoutPlanView: View {
                         }
                     }
                     .zIndex(20)
-                        
+                
                 SettingsPopoverView()
                     .frame(width: 280)
                     .padding(.trailing, 28)
@@ -67,25 +67,9 @@ struct WorkoutPlanView: View {
                     .zIndex(30)
             }
         }
-        .toolbar{
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                        showSettings = true
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.black)
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-        }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
     }
-
     
     private var mainContent: some View {
         VStack(spacing: 0) {
@@ -127,13 +111,28 @@ struct WorkoutPlanView: View {
     }
     
     private var headerArea: some View {
-        Header(
-            content: HeaderContent(
-                title: "WORKOUT PLAN",
-                subtitle: "",
-                description: "We got u mama, leave it to us!"
+        ZStack(alignment: .topTrailing) {
+            Header(
+                content: HeaderContent(
+                    title: "WORKOUT PLAN",
+                    subtitle: "",
+                    description: "We got u mama, leave it to us!"
+                ),
+                flowerOffset: CGSize(width: 70, height: 120)
             )
-        )
+            
+            Button {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                    showSettings = true
+                }
+            } label: {
+                MenuButton()
+            }
+            .buttonStyle(.plain)
+            .opacity(showSettings ? 0 : 1)
+            .allowsHitTesting(!showSettings)
+            .padding(.trailing, 20)
+        }
     }
     
     private var backgroundView: some View {

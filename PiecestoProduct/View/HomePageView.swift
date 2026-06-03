@@ -107,10 +107,11 @@ struct HomePageView: View {
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.black)
+                            .foregroundStyle(.white)
                             .frame(width: 44, height: 44)
-                            .background(.white)
+                            .background(Color(red: 0.63, green: 0.58, blue: 0.73))
                             .clipShape(Circle())
+                            .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                     }
                     .buttonStyle(.plain)
                     .opacity(showSettings ? 0 : 1)
