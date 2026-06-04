@@ -20,6 +20,9 @@ struct HomePageView: View {
     
     @State private var energyProgress: CGFloat = 0.5
     
+    var onWorkoutTap: (EnergyState) -> Void = {_ in}
+    var onBackTap: () -> Void = {}
+    
     private var isDark: Bool {
         colorScheme == .dark
     }
@@ -216,7 +219,12 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        NavigationLink(value: AppRoute.plan(energyState)) {
+                        Button{
+                            print(
+                                "HomePageView is passing local state: \(energyState.title)"
+                            )
+                            onWorkoutTap(energyState)
+                        } label:{
                             HStack {
                                 Text("WORKOUT")
                                     .font(
@@ -239,6 +247,7 @@ struct HomePageView: View {
                             )
                             .clipShape(Capsule())
                         }
+
                         .padding(.bottom, 10)
                     }
                 }

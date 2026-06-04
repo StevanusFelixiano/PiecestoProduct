@@ -17,7 +17,8 @@ struct WorkoutPlanView: View {
     
     var onBackTap: () -> Void = {}
     
-    let energyState: EnergyState
+    @Binding var energyState: EnergyState
+
     @State private var selectedVideo: WorkoutVideo?
     
     private var isDark: Bool {
@@ -60,10 +61,16 @@ struct WorkoutPlanView: View {
             }
         }
         .onAppear {
-            // When the view appears, grab a random video matching the user's energy!
             if selectedVideo == nil {
                 selectedVideo = WorkoutData.getRandomVideo(for: energyState)
             }
+        }
+        .onChange(of: energyState) { oldState,
+            newState in
+            print(
+                "WorkoutPlanView detected state shift: Recalculating recommendation cards for \(newState.title)"
+            )
+            selectedVideo = WorkoutData.getRandomVideo(for: newState)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -163,6 +170,7 @@ struct WorkoutPlanView: View {
                 .opacity(showSettings ? 0 : 1)
                 .allowsHitTesting(!showSettings)
             }
+            .padding (.top, 60)
             .padding(.horizontal, 20)
         }
     }
@@ -254,6 +262,8 @@ struct WorkoutPlanRow: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutPlanView(energyState: .findingRhythm)
+        WorkoutPlanView(
+            onBackTap: {},
+            energyState: .constant(.findingRhythm))
     }
 }
