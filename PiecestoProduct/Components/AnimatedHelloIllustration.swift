@@ -111,6 +111,7 @@ struct AnimatedHelloIllustration: View {
                         .rotationEffect(.degrees(waveHand ? 18 : -12), anchor: .bottomLeading)
                 }
                 .offset(y: floatAvatar ? -7 : 7)
+                .padding(.vertical, 14)
                 
                 Text("Hi, Mama")
                     .font(.headline)
