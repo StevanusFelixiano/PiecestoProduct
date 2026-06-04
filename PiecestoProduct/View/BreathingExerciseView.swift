@@ -38,7 +38,9 @@ struct BreathingExerciseView: View {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
                             showSettings = false
                         }
                     }
@@ -53,6 +55,29 @@ struct BreathingExerciseView: View {
                         .combined(with: .opacity)
                     )
                     .zIndex(30)
+            }
+        }
+        .toolbar{
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
+                        showSettings = true
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(
+                            isDark
+                            ? Color.white
+                            : Color.black
+                        )
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -84,7 +109,6 @@ struct BreathingExerciseView: View {
             backgroundLayer
             
             VStack {
-                topBar
                 
                 Text("A MOMENT TO BREATHE")
                     .font(.system(size: 26, weight: .bold))
@@ -120,7 +144,8 @@ struct BreathingExerciseView: View {
                         .clipShape(Circle())
                         .shadow(
                             color: isDark
-                            ? Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.28)
+                            ? Color(red: 0.92, green: 0.42, blue: 0.56)
+                                .opacity(0.28)
                             : .black.opacity(0.08),
                             radius: 12,
                             y: 6
@@ -138,11 +163,7 @@ struct BreathingExerciseView: View {
                     .animation(.easeInOut(duration: 0.4), value: breathingLabel)
                     .padding(.top, 22)
                 
-                Button {
-                    timer?.invalidate()
-                    timer = nil
-                    dismiss()
-                } label: {
+                NavigationLink(value: AppRoute.finish){
                     Text("FINISH")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundStyle(.white)
@@ -155,12 +176,20 @@ struct BreathingExerciseView: View {
                         .clipShape(Capsule())
                         .shadow(
                             color: isDark
-                            ? Color(red: 0.82, green: 0.43, blue: 0.52).opacity(0.30)
-                            : Color(red: 250/255, green: 154/255, blue: 138/255).opacity(0.30),
+                            ? Color(red: 0.82, green: 0.43, blue: 0.52)
+                                .opacity(0.30)
+                            : Color(red: 250/255, green: 154/255, blue: 138/255)
+                                .opacity(0.30),
                             radius: 10,
                             y: 5
                         )
                 }
+                .simultaneousGesture(TapGesture().onEnded{
+                    timer?.invalidate()
+                    timer = nil
+                    isRunning = false
+                    isBreathing = false
+                })
                 .padding(.top, 52)
                 
                 Spacer()
@@ -185,7 +214,10 @@ struct BreathingExerciseView: View {
                     )
                     
                     Circle()
-                        .fill(Color(red: 0.85, green: 0.35, blue: 0.52).opacity(0.16))
+                        .fill(
+                            Color(red: 0.85, green: 0.35, blue: 0.52)
+                                .opacity(0.16)
+                        )
                         .frame(width: 320, height: 320)
                         .blur(radius: 60)
                         .position(
@@ -194,7 +226,10 @@ struct BreathingExerciseView: View {
                         )
                     
                     Circle()
-                        .fill(Color(red: 0.45, green: 0.72, blue: 0.88).opacity(0.12))
+                        .fill(
+                            Color(red: 0.45, green: 0.72, blue: 0.88)
+                                .opacity(0.12)
+                        )
                         .frame(width: 280, height: 280)
                         .blur(radius: 55)
                         .position(
@@ -205,7 +240,10 @@ struct BreathingExerciseView: View {
                     Image("BreathingBackground")
                         .resizable()
                         .scaledToFill()
-                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .frame(
+                            width: geometry.size.width,
+                            height: geometry.size.height
+                        )
                         .clipped()
                 }
             }
@@ -300,12 +338,16 @@ struct BreathingExerciseView: View {
                         LinearGradient(
                             colors: isDark
                             ? [
-                                Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.85),
-                                Color(red: 0.55, green: 0.80, blue: 0.88).opacity(0.70)
+                                Color(red: 0.92, green: 0.42, blue: 0.56)
+                                    .opacity(0.85),
+                                Color(red: 0.55, green: 0.80, blue: 0.88)
+                                    .opacity(0.70)
                             ]
                             : [
-                                Color(red: 0.42, green: 0.82, blue: 0.90).opacity(0.75),
-                                Color(red: 0.88, green: 0.92, blue: 0.68).opacity(0.55)
+                                Color(red: 0.42, green: 0.82, blue: 0.90)
+                                    .opacity(0.75),
+                                Color(red: 0.88, green: 0.92, blue: 0.68)
+                                    .opacity(0.55)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -367,24 +409,21 @@ struct BreathingExerciseView: View {
         playBreathSound(isIn: true)
         
         timer?.invalidate()
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { currentTimer in
-            if remainingSeconds > 0 {
-                remainingSeconds -= 1
-            } else {
-                currentTimer.invalidate()
-                timer = nil
-                isRunning = false
-                isBreathing = false
-            }
-        }
         
-        breathingTimer?.invalidate()
-        breathingTimer = Timer.scheduledTimer(withTimeInterval: 2.8, repeats: true) { _ in
-            withAnimation(.easeInOut(duration: 2.8)) {
-                isBreathing.toggle()
+        timer = Timer
+            .scheduledTimer(
+                withTimeInterval: 1,
+                repeats: true
+            ) { currentTimer in
+                if remainingSeconds > 0 {
+                    remainingSeconds -= 1
+                } else {
+                    currentTimer.invalidate()
+                    timer = nil
+                    isRunning = false
+                    isBreathing = false
+                }
             }
-            playBreathSound(isIn: isBreathing)
-        }
     }
     
     private func pauseTimer() {

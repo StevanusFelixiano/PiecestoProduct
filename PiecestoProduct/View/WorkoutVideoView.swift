@@ -48,7 +48,9 @@ struct WorkoutVideoView: View {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
                             showSettings = false
                         }
                     }
@@ -70,40 +72,40 @@ struct WorkoutVideoView: View {
     }
     
     private var mainContent: some View {
-        ZStack(alignment: .bottom) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    headerArea
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                headerArea
+                
+                VStack(alignment: .center, spacing: 24) {
+                    videoSection
                     
-                    VStack(alignment: .leading, spacing: 24) {
-                        videoSection
-                        
-                        stepsSection
+                    stepsSection
+                    
+                    NavigationLink(value: AppRoute.breathing){
+                        Text("Breathing Exercise")
+                            .font(
+                                .system(size: 17 * textScale, weight: .semibold)
+                            )
+                            .foregroundStyle(.white)
+                            .frame(width: 160, height: 15)
+                            .padding(16)
+                            .background(isDark ? darkPeach : peach)
+                            .clipShape(Capsule())
+                            .shadow(
+                                color: (isDark ? darkPeach : peach)
+                                    .opacity(0.30),
+                                radius: 10,
+                                y: 5
+                            )
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 32)
                     .padding(.bottom, 120)
                 }
+                .padding(.horizontal, 20)
+                .padding(.top, 32)
+                .padding(.bottom, 40)
             }
-            .ignoresSafeArea(edges: .top)
-            
-            Button {
-                // TODO: navigate to BreathingExerciseView
-            } label: {
-                Text("Breathing Exercise")
-                    .font(.system(size: 17 * textScale, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 200, height: 15)
-                    .padding(16)
-                    .background(isDark ? darkPeach : peach)
-                    .clipShape(Capsule())
-                    .shadow(
-                        color: (isDark ? darkPeach : peach).opacity(0.30),
-                        radius: 10,
-                        y: 5
-                    )
-            }
-            .padding(.bottom, 22)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
@@ -164,7 +166,7 @@ struct WorkoutVideoView: View {
             Color.gray.opacity(0.2)
                 .frame(height: 220)
                 .cornerRadius(20)
-            
+                
             Button {
             } label: {
                 Image(systemName: "play.circle.fill")
@@ -176,20 +178,20 @@ struct WorkoutVideoView: View {
             }
         }
     }
-    
+        
     private var stepsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("STEPS")
                 .font(.system(size: 18 * textScale, weight: .bold))
                 .foregroundStyle(isDark ? darkPeach : textBrown)
                 .tracking(1.0)
-            
+                
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(steps.indices, id: \.self) { index in
                     HStack(alignment: .top, spacing: 12) {
                         Text("\(index + 1).")
                             .fontWeight(.bold)
-                        
+                            
                         Text(steps[index])
                             .lineSpacing(4)
                     }

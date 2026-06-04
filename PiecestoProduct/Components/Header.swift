@@ -17,16 +17,12 @@ struct Header: View {
     let content: HeaderContent
     let flowerOffset: CGSize
     
-    let showMenuButton: Bool
-    
     init(
         content: HeaderContent,
-        flowerOffset: CGSize = CGSize(width: 100, height: 100),
-        showMenuButton: Bool = true,
+        flowerOffset: CGSize = CGSize(width: 100, height: 100)
     ) {
         self.content = content
         self.flowerOffset = flowerOffset
-        self.showMenuButton = showMenuButton
     }
     
     private var isDark: Bool {
@@ -39,29 +35,6 @@ struct Header: View {
     
     private var headerSection: some View {
         ZStack(alignment: .trailing) {
-            if showSettings {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(
-                            .spring(response: 0.3, dampingFraction: 0.85)
-                        ) {
-                            showSettings = false
-                        }
-                    }
-                    .zIndex(20)
-                            
-                SettingsPopoverView()
-                    .frame(width: 280)
-                    .padding(.trailing, 28)
-                    .padding(.top, 58)
-                    .transition(
-                        .scale(scale: 0.92, anchor: .topTrailing)
-                        .combined(with: .opacity)
-                    )
-                    .zIndex(30)
-            }
-            
             VStack(alignment: .leading, spacing: 6) {
                 Text(content.title)
                     .font(.system(size: 25 * textScale, weight: .bold))
@@ -119,12 +92,6 @@ struct Header: View {
                 bottomLeadingRadius: 20,
                 bottomTrailingRadius: 20
             )
-        )
-        .shadow(
-            color: isDark ? .black.opacity(0.25) : .black.opacity(0.1),
-            radius: 10,
-            x: 0,
-            y: 5
         )
     }
     

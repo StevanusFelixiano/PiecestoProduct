@@ -15,18 +15,10 @@ struct WorkoutPlanView: View {
     
     @State private var showSettings = false
     
-    private let workoutItems = [
-        WorkoutPlanItem(
-            iconName: "WorkoutIcon",
-            title: "Mat Pilates with Julius",
-            subtitle: "A gentle 10-minute session"
-        ),
-        WorkoutPlanItem(
-            iconName: "BreathingIcon",
-            title: "A Momen To Breathe",
-            subtitle: "A calming 3-minute pause"
-        )
-    ]
+    var onBackTap: () -> Void = {}
+    
+    let energyState: EnergyState
+    @State private var selectedVideo: WorkoutVideo?
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -67,6 +59,12 @@ struct WorkoutPlanView: View {
                     .zIndex(30)
             }
         }
+        .onAppear {
+            // When the view appears, grab a random video matching the user's energy!
+            if selectedVideo == nil {
+                selectedVideo = WorkoutData.getRandomVideo(for: energyState)
+            }
+        }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -74,35 +72,49 @@ struct WorkoutPlanView: View {
     private var mainContent: some View {
         VStack(spacing: 0) {
             headerArea
+                .frame(height: 240)
             
             VStack(spacing: 34) {
                 VStack(spacing: 32) {
-                    ForEach(workoutItems) { item in
+                    if let video = selectedVideo {
                         WorkoutPlanRow(
-                            item: item,
+                            iconName: "WorkoutIcon",
+                            title: video.title,
+                            subtitle: "Guided by \(video.instructor)",
                             textScale: textScale,
                             isDark: isDark
                         )
                     }
+                    WorkoutPlanRow(
+                        iconName: "BreathingIcon",
+                        title: "Breathing Exercise",
+                        subtitle: "A calming 3-minute pause",
+                        textScale: textScale,
+                        isDark: isDark
+                    )
                 }
                 .padding(.horizontal, 20)
                 
-                NavigationLink(value: AppRoute.video) {
-                    Text("START")
-                        .font(.system(size: 17 * textScale, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 170, height: 54)
-                        .background(isDark ? darkPeach : peach)
-                        .clipShape(Capsule())
-                        .shadow(
-                            color: (isDark ? darkPeach : peach).opacity(0.30),
-                            radius: 10,
-                            y: 5
-                        )
+                if let video = selectedVideo {
+                    NavigationLink(value: AppRoute.video(video)) {
+                        Text("START")
+                            .font(.system(size: 17 * textScale, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 170, height: 54)
+                            .background(isDark ? darkPeach : peach)
+                            .clipShape(Capsule())
+                            .shadow(
+                                color: (isDark ? darkPeach : peach)
+                                    .opacity(0.30),
+                                radius: 10,
+                                y: 5
+                            )
+                    }
+                    .padding(.top, 24)
+                    .buttonStyle(.plain)
                 }
-                .padding(.top, 24)
             }
-            .padding(.top, -24)
+            .padding(.top, 40)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -112,27 +124,52 @@ struct WorkoutPlanView: View {
     }
     
     private var headerArea: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topTrailing){
             Header(
                 content: HeaderContent(
                     title: "WORKOUT PLAN",
                     subtitle: "",
                     description: "We've got you, Mama. Leave the planning to us!"
-                ),
-                flowerOffset: CGSize(width: 70, height: 120)
+                )
             )
-            
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                    showSettings = true
-                }
-            } label: {
-                MenuButton()
+            .frame(height: 240)
+            .onTapGesture {
+                onBackTap()
             }
+            HStack{
+                Button{
+                    onBackTap()
+                } label:{
+                    Image(systemName: "chevron.left")
+                    .font(.system(size: 22, weight: .bold))
+                    .foregroundStyle(.black)
+                    .frame(width: 44, height: 44)
+                    .background(Color.white)
+                    .clipShape(Circle())
+                    .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
+                }
+                Spacer()
+                
+                Button {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
+                        showSettings = true
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.black)
+                        .frame(width: 44, height: 44)
+                        .background(.white)
+                        .clipShape(Circle())
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 60)
             .buttonStyle(.plain)
             .opacity(showSettings ? 0 : 1)
             .allowsHitTesting(!showSettings)
-            .padding(.trailing, 20)
         }
     }
     
@@ -173,7 +210,9 @@ struct WorkoutPlanView: View {
 }
 
 struct WorkoutPlanRow: View {
-    let item: WorkoutPlanItem
+    let iconName: String
+    let title: String
+    let subtitle: String
     let textScale: Double
     let isDark: Bool
     
@@ -187,13 +226,13 @@ struct WorkoutPlanRow: View {
     
     var body: some View {
         HStack(spacing: 22) {
-            Image(item.iconName)
+            Image(iconName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 55, height: 55)
             
             VStack(alignment: .leading, spacing: 6) {
-                Text(item.title)
+                Text(title)
                     .font(.system(size: 20 * textScale, weight: .bold))
                     .foregroundStyle(
                         isDark
@@ -203,7 +242,7 @@ struct WorkoutPlanRow: View {
                     .frame(maxWidth: 300, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
                 
-                Text(item.subtitle)
+                Text(subtitle)
                     .font(.system(size: 15 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
@@ -221,6 +260,6 @@ struct WorkoutPlanRow: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutPlanView()
+        WorkoutPlanView(energyState: .findingRhythm)
     }
 }

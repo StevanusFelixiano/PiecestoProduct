@@ -19,6 +19,13 @@ struct HomePageView: View {
     
     @State private var energyProgress: CGFloat = 0.5
     
+    @State private var showWorkoutPlan = false
+    
+    var onWorkoutTap: (EnergyState) -> Void = {_ in}
+    var onBackTap: () -> Void = {}
+    
+    //    @Binding var
+    
     private var isDark: Bool {
         colorScheme == .dark
     }
@@ -32,59 +39,50 @@ struct HomePageView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .topTrailing) {
-                
-                contentArea
-                
-                if showSettings {
-                    Color.black.opacity(0.001)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(
-                                .spring(response: 0.3, dampingFraction: 0.85)
-                            ) {
-                                showSettings = false
-                            }
-                        }
-                        .zIndex(20)
-                    
-                    SettingsPopoverView()
-                        .frame(width: 280)
-                        .padding(.trailing, 28)
-                        .padding(.top, 20)
-                        .transition(
-                            .scale(scale: 0.92, anchor: .topTrailing)
-                            .combined(with: .opacity)
-                        )
-                        .zIndex(30)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                ZStack {
-                    Image("PlanBackground")
-                        .resizable()
-                        .scaledToFill()
-                        .ignoresSafeArea()
-                    
-                    if isDark {
-                        Color(red: 0.10, green: 0.07, blue: 0.09)
-                            .ignoresSafeArea()
-                    }
-                }
-            }
-            .navigationDestination(for: AppRoute.self) { route in
-                        switch route {
-                        case .plan:
-                            WorkoutPlanView()
-                        case .video:
-                            WorkoutVideoView()
+        ZStack(alignment: .topTrailing) {
+            
+            contentArea
+            
+            if showSettings {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
+                            showSettings = false
                         }
                     }
+                    .zIndex(20)
+                
+                SettingsPopoverView()
+                    .frame(width: 280)
+                    .padding(.trailing, 28)
+                    .padding(.top, 20)
+                    .transition(
+                        .scale(scale: 0.92, anchor: .topTrailing)
+                        .combined(with: .opacity)
+                    )
+                    .zIndex(30)
             }
         }
-
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            ZStack {
+                Image("OnboardBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                
+                if isDark {
+                    Color(red: 0.10, green: 0.07, blue: 0.09)
+                        .ignoresSafeArea()
+                }
+            }
+        }
+        .toolbar(.hidden, for: .navigationBar)
+    }
+    
     private var contentArea: some View {
         ZStack{
             VStack(alignment: .center, spacing: -3) {
@@ -96,7 +94,7 @@ struct HomePageView: View {
                             ? Color(red: 1.00, green: 0.84, blue: 0.86)
                             : Color(hex: "5B4428")
                         )
-                    
+                        
                     Spacer()
                     Button {
                         withAnimation(
@@ -117,8 +115,10 @@ struct HomePageView: View {
                     .opacity(showSettings ? 0 : 1)
                     .allowsHitTesting(!showSettings)
                 }
-                .padding(20)
-                
+                .padding(.horizontal, 24)
+                .padding(.top, 10)
+                .padding(.bottom, 20)
+                    
                 Text("Hi, Sora!")
                     .font(
                         Font
@@ -134,54 +134,63 @@ struct HomePageView: View {
                         : Color(hex: "5B4428")
                     )
                     .padding(.bottom, 10)
-
-                Text("Let's do a quick check-in. How is your energy right now?")
-                    .font(.system(size: 17 * textScale))
-                    .foregroundStyle(
-                        isDark
-                        ? Color(red: 0.86, green: 0.72, blue: 0.74)
-                        : Color(hex: "5B4428")
-                    )
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-                    .fixedSize(horizontal: false, vertical: true)
-                
+                    
+                Text(
+                    "Let us do the gentle check,\n how is your energy level?"
+                )
+                .font(.system(size: 17 * textScale))
+                .foregroundStyle(
+                    isDark
+                    ? Color(red: 0.86, green: 0.72, blue: 0.74)
+                    : Color(hex: "5B4428")
+                )
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+                .padding (.bottom, 10)
+                .fixedSize(horizontal: false, vertical: true)
+                    
                 Spacer()
-                
+                    
                 Image(energyState.imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 300, height: 300)
-                    .animation(.spring, value: energyProgress)
+                    .animation(.smooth, value: energyProgress)
                     .offset(x: energyState.imageOffset)
-                
+                    
                 Spacer()
                     .padding(.bottom, 30)
-                
+                    
                 ZStack(alignment: .top) {
-                    
-                    
                     CurvedTopRectangle()
-                        .fill(isDark ? Color(hex: "FF8A7A") : Color(hex: "FA9A8A"))
+                        .fill(
+                            isDark ? Color(hex: "FF8A7A") : Color(
+                                hex: "#FA9A8A"
+                            )
+                        )
                         .ignoresSafeArea(edges: .bottom)
                         .ignoresSafeArea(edges: .bottom)
-                    
+                        
+                        
                     VStack(spacing: 30) {
                         CurvedSlider(progress: $energyProgress)
                             .frame(height: 100)
                             .padding(.top, -20)
-                        
+                            
                         VStack(spacing: 12) {
                             Text(energyState.title)
                                 .font(
-                                    .system(size: 18 * textScale, weight: .bold)
+                                    .system(
+                                        size: 18 * textScale,
+                                        weight: .bold
+                                    )
                                 )
                                 .tracking(1.5)
                                 .foregroundStyle(.white)
-                            
+                                
                             Text(energyState.description)
                                 .font(.system(size: 14 * textScale))
-                                .frame(maxWidth: 320)
+                                .frame(maxWidth: energyState.descriptionWidth)
                                 .lineSpacing(3)
                                 .multilineTextAlignment(.center)
                                 .tracking(0)
@@ -190,79 +199,55 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        NavigationLink(value: AppRoute.plan) {
+                        Button{
+                            onWorkoutTap(energyState)
+                        } label:{
                             HStack {
-                                Text("WORKOUT")
-                                    .font(
-                                        .system(
-                                            size: 14 * textScale,
-                                            weight: .bold
+                                    Text("WORKOUT")
+                                        .font(
+                                            .system(
+                                                size: 14 * textScale,
+                                                weight: .bold
+                                            )
                                         )
-                                    )
-                                Image(systemName: "chevron.down")
-                            }
-                            .foregroundStyle(
-                                Color(red: 0.29, green: 0.24, blue: 0.20)
-                            )
-                            .padding(.vertical, 12)
-                            .padding(.horizontal, 24)
-                            .background(Color.white)
-                            .clipShape(Capsule())
+                                    Image(systemName: "chevron.down")
+                                }
+                                .foregroundStyle(
+                                    Color(red: 0.29, green: 0.24, blue: 0.20)
+                                )
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 24)
+                                .background(Color.white)
+                                .clipShape(Capsule())
                         }
-                        .padding(.bottom, 10)
+                        .padding(.bottom, 20)
                     }
                 }
                 .frame(height: 300)
             }
         }
+        .background {
+            GeometryReader { geometry in
+                Color.clear
+                    .preference(
+                        key: TopInsetPreferenceKey.self,
+                        value: geometry.safeAreaInsets.top
+                    )
+            }
+        }
+        .padding(.top, 60)
+    }
+    
+    // MARK: - Safe Area Preference Tracker Hook
+    struct TopInsetPreferenceKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
+        }
     }
 }
 
 // MARK: - Supporting Types & Components
-
-enum EnergyState {
-    case needingRest, takingItEasy, findingRhythm, feelingGood, energized
-    
-    var title: String {
-        switch self {
-        case .needingRest: return "\"NEEDING REST\""
-        case .takingItEasy: return "\"TAKING IT EASY\""
-        case .findingRhythm: return "\"FINDING YOUR RHYTHM\""
-        case .feelingGood: return "\"FEELING GOOD\""
-        case .energized: return "\"ENERGIZED\""
-        }
-    }
-    
-    var description: String {
-        switch self {
-        case .needingRest: return "Your body has been carrying a lot lately. \nToday may be a day for slowing down and giving yourself extra care."
-        case .takingItEasy: return "You have some energy, but your body may still be asking for gentle movement and moments of rest."
-        case .findingRhythm: return "You're moving through the day steadily. \nListen to your body and take things at a pace that feels right."
-        case .feelingGood: return "Your energy is showing up today. \nEnjoy what feels manageable while still making space for yourself."
-        case .energized: return "Your body feels ready to move and engage today. \nCelebrate this moment and continue treating yourself with kindness."
-        }
-    }
-    
-    var imageName: String {
-        switch self {
-        case .needingRest: return "FlowerEmpty"
-        case .takingItEasy: return "Flower2Petals"
-        case .findingRhythm: return "Flower4Petals"
-        case .feelingGood: return "Flower6Petals"
-        case .energized: return "FullFlower"
-        }
-    }
-    
-    var imageOffset: CGFloat {
-        switch self {
-        case .needingRest: return -4 // Moves it 5 pixels to the left
-        case .takingItEasy: return 0
-        case .findingRhythm: return 0
-        case .feelingGood: return 0
-        case .energized: return 0
-        }
-    }
-}
 
 struct CurvedSlider: View {
     @Binding var progress: CGFloat
@@ -405,11 +390,6 @@ extension Color {
             opacity: Double(a) / 255
         )
     }
-}
-
-enum AppRoute: Hashable {
-    case plan
-    case video
 }
 
 

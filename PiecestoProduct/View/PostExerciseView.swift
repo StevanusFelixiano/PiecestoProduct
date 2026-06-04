@@ -44,6 +44,29 @@ struct PostExerciseView: View {
                     .zIndex(30)
             }
         }
+        .toolbar{
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
+                        showSettings = true
+                    }
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(
+                            isDark
+                            ? Color.white
+                            : Color.black
+                        )
+                        .clipShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
+            }
+        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             backgroundView
@@ -52,25 +75,7 @@ struct PostExerciseView: View {
     
     private var mainContent: some View {
         VStack {
-            HStack {
-                Spacer()
-                
-                Button {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                        showSettings = true
-                    }
-                } label: {
-                    MenuButton()
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-            .padding(.horizontal, 20)
-            
             Spacer()
-                .frame(height: 60)
-            
             Image("FullFlower")
                 .resizable()
                 .scaledToFit()
@@ -98,9 +103,7 @@ struct PostExerciseView: View {
             }
             .padding(.horizontal, 42)
             
-            Button {
-                dismiss()
-            } label: {
+            NavigationLink(value: AppRoute.home){
                 Text("Back to Home")
                     .font(.system(size: 17 * textScale, weight: .semibold))
                     .foregroundStyle(.white)
@@ -120,6 +123,7 @@ struct PostExerciseView: View {
                         y: 5
                     )
             }
+            
             .padding(.horizontal, 52)
             .padding(.top, 40)
             
