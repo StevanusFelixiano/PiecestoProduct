@@ -78,8 +78,8 @@ struct HomePageView: View {
                         switch route {
                         case .plan(let state):
                             WorkoutPlanView(energyState: state)
-                        case .video:
-                            WorkoutVideoView()
+                        case .video(let video):
+                            WorkoutVideoView(video: video)
                         }
                     }
             }
