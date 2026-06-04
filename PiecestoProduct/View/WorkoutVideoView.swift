@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WorkoutVideoView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
     @AppStorage("textScale") private var textScale = 1.0
@@ -68,39 +68,48 @@ struct WorkoutVideoView: View {
     }
     
     private var mainContent: some View {
+        ZStack(alignment: .bottom) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     headerArea
                     
                     VStack(alignment: .leading, spacing: 24) {
                         videoSection
-                        //YouTubeView(videoId: video.youtubeId)
+                        // YouTubeView(videoId: video.youtubeId)
                         
                         stepsSection
-                        Button {
-                            isPresentingBreathing = true
-                        } label: {
-                            Text("Cool Down Breathing")
-                                .font(.system(size: 17 * textScale, weight: .semibold))
-                                .foregroundStyle(.white)
-                                .frame(width: 220, height: 15)
-                                .padding(16)
-                                .background(isDark ? darkPeach : peach)
-                                .clipShape(Capsule())
-                                .shadow(color: (isDark ? darkPeach : peach).opacity(0.30), radius: 10, y: 5)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, 20)
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 32)
-                    .padding(.bottom, 40)
+                    .padding(.bottom, 120)
                 }
             }
             .ignoresSafeArea(edges: .top)
-            .background { backgroundView }
+            
+            Button {
+                isPresentingBreathing = true
+            } label: {
+                Text("Cool Down Breathing")
+                    .font(.system(size: 17 * textScale, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 220, height: 15)
+                    .padding(16)
+                    .background(isDark ? darkPeach : peach)
+                    .clipShape(Capsule())
+                    .shadow(
+                        color: (isDark ? darkPeach : peach).opacity(0.30),
+                        radius: 10,
+                        y: 5
+                    )
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.bottom, 20)
         }
-    
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            backgroundView
+        }
+    }
     private var headerArea: some View {
         ZStack(alignment: .topTrailing) {
             Header(
@@ -112,17 +121,34 @@ struct WorkoutVideoView: View {
                 flowerOffset: CGSize(width: 80, height: 113)
             )
             
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                    showSettings = true
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                 }
-            } label: {
-                MenuButton()
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        showSettings = true
+                    }
+                } label: {
+                    MenuButton()
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
             }
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
-            .padding(.trailing, 20)
+            .padding(.horizontal, 20)
             .padding(.top, 58)
         }
     }

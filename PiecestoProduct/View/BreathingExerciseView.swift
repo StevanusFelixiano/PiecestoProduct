@@ -19,6 +19,7 @@ struct BreathingExerciseView: View {
     @State private var timer: Timer?
     @State private var breathingTimer: Timer?
     @State private var audioPlayer: AVAudioPlayer?
+    @State private var isShowingPostExercise = false
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -62,6 +63,9 @@ struct BreathingExerciseView: View {
             breathingTimer?.invalidate()
             breathingTimer = nil
         }
+        .fullScreenCover(isPresented: $isShowingPostExercise) {
+            PostExerciseView()
+        }
     }
     
     private func playBreathSound(isIn: Bool) {
@@ -79,7 +83,6 @@ struct BreathingExerciseView: View {
     }
     
     private var mainContent: some View {
-        
         ZStack {
             backgroundLayer
             
@@ -141,7 +144,12 @@ struct BreathingExerciseView: View {
                 Button {
                     timer?.invalidate()
                     timer = nil
-                    dismiss()
+                    breathingTimer?.invalidate()
+                    breathingTimer = nil
+                    isRunning = false
+                    isBreathing = false
+                    
+                    isShowingPostExercise = true
                 } label: {
                     Text("FINISH")
                         .font(.system(size: 17, weight: .bold))
@@ -229,7 +237,6 @@ struct BreathingExerciseView: View {
             }
             .buttonStyle(.plain)
             .padding(.horizontal, 28)
-            
             
             Spacer()
             
@@ -348,7 +355,6 @@ struct BreathingExerciseView: View {
                     ? Color.white.opacity(0.92)
                     : Color(red: 0.32, green: 0.25, blue: 0.20)
                 )
-            
         }
         .frame(width: 270, height: 270)
     }

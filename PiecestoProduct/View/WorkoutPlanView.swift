@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WorkoutPlanView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
     @AppStorage("textScale") private var textScale = 1.0
@@ -129,17 +129,34 @@ struct WorkoutPlanView: View {
                 flowerOffset: CGSize(width: 70, height: 120)
             )
             
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                    showSettings = true
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                 }
-            } label: {
-                MenuButton()
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        showSettings = true
+                    }
+                } label: {
+                    MenuButton()
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
             }
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
-            .padding(.trailing, 20)
+            .padding(.horizontal, 20)
         }
     }
     
