@@ -20,7 +20,13 @@ struct HomePageView: View {
     
     @State private var energyProgress: CGFloat = 0.5
     var topPadding: CGFloat = 0
+    var topBarPadding: CGFloat = 20
+    var settingsPopoverTopPadding: CGFloat = 20
+    var topFlowerSpacing: CGFloat = 20
+    var bottomFlowerSpacing: CGFloat = 40
+    var curvedSectionYOffset: CGFloat = 0
     var onWorkoutTap: (EnergyState) -> Void = {_ in}
+    var onEnergyChange: (EnergyState) -> Void = { _ in }
     var onBackTap: () -> Void = {}
     
     private var isDark: Bool {
@@ -54,7 +60,7 @@ struct HomePageView: View {
                 SettingsPopoverView()
                     .frame(width: 280)
                     .padding(.trailing, 28)
-                    .padding(.top, 20)
+                    .padding(.top, settingsPopoverTopPadding)
                     .transition(
                         .scale(scale: 0.92, anchor: .topTrailing)
                         .combined(with: .opacity)
@@ -75,6 +81,12 @@ struct HomePageView: View {
                         .ignoresSafeArea()
                 }
             }
+        }
+        .onAppear {
+            onEnergyChange(energyState)
+        }
+        .onChange(of: energyState) { oldValue, newValue in
+            onEnergyChange(newValue)
         }
     }
     
@@ -110,7 +122,9 @@ struct HomePageView: View {
                     .opacity(showSettings ? 0 : 1)
                     .allowsHitTesting(!showSettings)
                 }
-                .padding(20)
+                .padding(.horizontal, 20)
+                .padding(.bottom, topBarPadding)
+                .padding(.top, 20)
                 
                 Text("Hi, \(userName.isEmpty ? "Mama" : userName)!")
                     .font(
@@ -149,9 +163,9 @@ struct HomePageView: View {
                     .frame(width: 300, height: 300)
                     .animation(.spring, value: energyProgress)
                     .offset(x: energyState.imageOffset)
-                
+                    .padding(.bottom, 30)
+
                 Spacer()
-                    .padding(.bottom, 20)
                 
                 ZStack(alignment: .top) {
                     
@@ -235,6 +249,7 @@ struct HomePageView: View {
                     }
                 }
                 .frame(height: 300)
+                .offset(y: curvedSectionYOffset)
             }
         }
         .background {

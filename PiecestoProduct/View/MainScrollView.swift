@@ -9,24 +9,23 @@ import SwiftUI
 
 struct MainScrollView: View {
     @State private var path = NavigationPath()
-    @State private var isScrollDisabled = true
     @State private var selectedEnergy: EnergyState = .findingRhythm
     @State private var workoutPlanRefreshID = UUID()
+    @State private var currentSection: String?
     
     var body: some View {
         NavigationStack(path: $path) {
             ScrollViewReader { proxy in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
-                        
                         HomePageView(
                             topPadding: 44,
+                            topBarPadding: 22,
+                            settingsPopoverTopPadding: 60,
+                            curvedSectionYOffset: -8,
                             onWorkoutTap: { incomingEnergy in
-                                print("MainScrollView received energy state: \(incomingEnergy.title)")
-                                
                                 selectedEnergy = incomingEnergy
                                 workoutPlanRefreshID = UUID()
-                                isScrollDisabled = false
                                 
                                 withAnimation(
                                     .spring(
@@ -39,10 +38,9 @@ struct MainScrollView: View {
                                         anchor: .top
                                     )
                                 }
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                    isScrollDisabled = true
-                                }
+                            },
+                            onEnergyChange: { newEnergy in
+                                selectedEnergy = newEnergy
                             }
                         )
                         .id("homepage_section")
@@ -51,8 +49,6 @@ struct MainScrollView: View {
                         ZStack {
                             WorkoutPlanView(
                                 onBackTap: {
-                                    isScrollDisabled = false
-                                    
                                     withAnimation(
                                         .spring(
                                             response: 0.6,
@@ -64,10 +60,6 @@ struct MainScrollView: View {
                                             anchor: .top
                                         )
                                     }
-                                    
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                        isScrollDisabled = true
-                                    }
                                 },
                                 energyState: $selectedEnergy
                             )
@@ -76,9 +68,17 @@ struct MainScrollView: View {
                         .id("workout_plan_section")
                         .containerRelativeFrame(.vertical, alignment: .center)
                     }
+                    .scrollTargetLayout()
                 }
                 .contentMargins(0, for: .scrollContent)
-                .scrollDisabled(isScrollDisabled)
+                .scrollTargetBehavior(.paging)
+                .scrollPosition(id: $currentSection)
+                .onChange(of: currentSection) { oldValue, newValue in
+                    if newValue == "workout_plan_section",
+                       oldValue != "workout_plan_section" {
+                        workoutPlanRefreshID = UUID()
+                    }
+                }
                 .ignoresSafeArea()
                 .navigationDestination(for: AppRoute.self) { route in
                     switch route {
@@ -90,8 +90,6 @@ struct MainScrollView: View {
                         
                     case .finish:
                         PostExerciseView {
-                            isScrollDisabled = false
-                            
                             var transaction = Transaction()
                             transaction.animation = nil
                             
@@ -104,10 +102,6 @@ struct MainScrollView: View {
                             
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                 path.removeLast(path.count)
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    isScrollDisabled = true
-                                }
                             }
                         }
                         
