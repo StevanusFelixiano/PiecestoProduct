@@ -14,6 +14,7 @@ struct HomePageView: View {
         "hasCompletedInitialSetup"
     ) private var hasCompletedInitialSetup = false
     @AppStorage("textScale") private var textScale = 1.0
+    @AppStorage("userName") private var userName = ""
     
     @State private var showSettings = false
     
@@ -119,7 +120,7 @@ struct HomePageView: View {
                 }
                 .padding(20)
                 
-                Text("Hi, Sora!")
+                Text("Hi, \(userName.isEmpty ? "Mama" : userName)!")
                     .font(
                         Font
                             .system(
