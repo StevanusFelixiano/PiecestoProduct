@@ -8,15 +8,22 @@
 import SwiftUI
 
 struct WorkoutVideoView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
     @AppStorage("textScale") private var textScale = 1.0
     
     @State private var showSettings = false
     
+    let video: WorkoutVideo
+    @State private var isPresentingBreathing = false
+    
     private var isDark: Bool {
         colorScheme == .dark
+    }
+    
+    private var buttonTopPadding: CGFloat {
+        textScale > 1.15 ? 32 : 58
     }
     
     private var peach: Color {
@@ -31,14 +38,6 @@ struct WorkoutVideoView: View {
         Color(red: 0.46, green: 0.36, blue: 0.35)
     }
     
-    private let steps = [
-        "Sit comfortably on your mat",
-        "Start with gentle neck and shoulder stretches",
-        "Slowly roll your shoulders and loosen your back",
-        "Follow light core and leg movements",
-        "Focus on breathing and moving at your own pace",
-        "Finish with a full body stretch and short rest"
-    ]
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
@@ -66,6 +65,9 @@ struct WorkoutVideoView: View {
                     )
                     .zIndex(30)
             }
+        }
+        .fullScreenCover(isPresented: $isPresentingBreathing) {
+            BreathingExerciseView()
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -102,40 +104,73 @@ struct WorkoutVideoView: View {
                     .padding(.top, 32)
                     .padding(.bottom, 120)
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 32)
-                .padding(.bottom, 40)
             }
+            .ignoresSafeArea(edges: .top)
+            
+            Button {
+                isPresentingBreathing = true
+            } label: {
+                Text("Cool Down Breathing")
+                    .font(.system(size: 17 * textScale, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 220, height: 15)
+                    .padding(16)
+                    .background(isDark ? darkPeach : peach)
+                    .clipShape(Capsule())
+                    .shadow(
+                        color: (isDark ? darkPeach : peach).opacity(0.30),
+                        radius: 10,
+                        y: 5
+                    )
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.bottom, 20)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             backgroundView
         }
     }
-    
     private var headerArea: some View {
         ZStack(alignment: .topTrailing) {
             Header(
                 content: HeaderContent(
                     title: "WORKOUT",
-                    subtitle: "Mat Pilates with Julius",
-                    description: "Gentle movements to help you feel stronger and lighter"
+                    subtitle: video.title,
+                    description: "Guided by \(video.instructor)"
                 ),
                 flowerOffset: CGSize(width: 80, height: 113)
             )
             
-            Button {
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
-                    showSettings = true
+            HStack {
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                 }
-            } label: {
-                MenuButton()
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        showSettings = true
+                    }
+                } label: {
+                    MenuButton()
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
             }
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
-            .padding(.trailing, 20)
-            .padding(.top, 58)
+            .padding(.horizontal, 20)
+            .padding(.top, buttonTopPadding)
         }
     }
     
@@ -163,36 +198,25 @@ struct WorkoutVideoView: View {
     
     private var videoSection: some View {
         ZStack {
-            Color.gray.opacity(0.2)
-                .frame(height: 220)
-                .cornerRadius(20)
-                
-            Button {
-            } label: {
-                Image(systemName: "play.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .foregroundStyle(.white)
-                    .background(Circle().fill(.black.opacity(0.2)))
-            }
+            WorkoutVideoPlayer(videoID: video.youtubeId)
         }
     }
-        
+    
     private var stepsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("STEPS")
+            Text("WHAT TO EXPECT")
                 .font(.system(size: 18 * textScale, weight: .bold))
                 .foregroundStyle(isDark ? darkPeach : textBrown)
                 .tracking(1.0)
-                
+                .padding(.top, 5)
+            
             VStack(alignment: .leading, spacing: 12) {
-                ForEach(steps.indices, id: \.self) { index in
+                ForEach(video.steps.indices, id: \.self) { index in
                     HStack(alignment: .top, spacing: 12) {
                         Text("\(index + 1).")
                             .fontWeight(.bold)
-                            
-                        Text(steps[index])
+                        
+                        Text(video.steps[index])
                             .lineSpacing(4)
                     }
                     .font(.system(size: 16 * textScale))
@@ -205,6 +229,6 @@ struct WorkoutVideoView: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutVideoView()
+        WorkoutVideoView(video: WorkoutData.videos[0])
     }
 }

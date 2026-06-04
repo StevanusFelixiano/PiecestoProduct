@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4FC56B492FD01CFF00D2A93B /* YouTubePlayerKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4FC56B482FD01CFF00D2A93B /* YouTubePlayerKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CF936EFB2FBFEC8900547D45 /* PiecestoProduct.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PiecestoProduct.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4FC56B492FD01CFF00D2A93B /* YouTubePlayerKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = PiecestoProduct;
 			packageProductDependencies = (
+				4FC56B482FD01CFF00D2A93B /* YouTubePlayerKit */,
 			);
 			productName = PiecestoProduct;
 			productReference = CF936EFB2FBFEC8900547D45 /* PiecestoProduct.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = CF936EF22FBFEC8900547D45;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				4FC56B472FD01CFF00D2A93B /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CF936EFC2FBFEC8900547D45 /* Products */;
 			projectDirPath = "";
@@ -253,7 +262,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z9S574BV42;
+				DEVELOPMENT_TEAM = H7K69KH363;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MoM;
@@ -287,7 +296,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = Z9S574BV42;
+				DEVELOPMENT_TEAM = H7K69KH363;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = MoM;
@@ -336,6 +345,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		4FC56B472FD01CFF00D2A93B /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SvenTiigi/YouTubePlayerKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.5;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		4FC56B482FD01CFF00D2A93B /* YouTubePlayerKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4FC56B472FD01CFF00D2A93B /* XCRemoteSwiftPackageReference "YouTubePlayerKit" */;
+			productName = YouTubePlayerKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CF936EF32FBFEC8900547D45 /* Project object */;
 }

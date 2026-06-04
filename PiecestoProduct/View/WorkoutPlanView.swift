@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WorkoutPlanView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
     @AppStorage("textScale") private var textScale = 1.0
@@ -141,35 +141,29 @@ struct WorkoutPlanView: View {
                     onBackTap()
                 } label:{
                     Image(systemName: "chevron.left")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(.black)
-                    .frame(width: 44, height: 44)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 48, height: 48)
+                        .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                        .clipShape(Circle())
+                        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                 }
+                .buttonStyle(.plain)
+                
                 Spacer()
                 
                 Button {
-                    withAnimation(
-                        .spring(response: 0.3, dampingFraction: 0.85)
-                    ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
                         showSettings = true
                     }
                 } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.black)
-                        .frame(width: 44, height: 44)
-                        .background(.white)
-                        .clipShape(Circle())
+                    MenuButton()
                 }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
             }
             .padding(.horizontal, 20)
-            .padding(.top, 60)
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
         }
     }
     
