@@ -20,7 +20,6 @@ struct BreathingExerciseView: View {
     @State private var timer: Timer?
     @State private var breathingTimer: Timer?
     @State private var audioPlayer: AVAudioPlayer?
-    @State private var isShowingPostExercise = false
     
     @AppStorage("textScale") private var textScale = 1.0
     
@@ -60,14 +59,13 @@ struct BreathingExerciseView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .onDisappear {
             timer?.invalidate()
             timer = nil
             breathingTimer?.invalidate()
             breathingTimer = nil
-        }
-        .fullScreenCover(isPresented: $isShowingPostExercise) {
-            PostExerciseView()
         }
     }
     
@@ -144,16 +142,7 @@ struct BreathingExerciseView: View {
                     .animation(.easeInOut(duration: 0.8), value: breathingLabel)
                     .padding(.top, 22)
                 
-                Button {
-                    timer?.invalidate()
-                    timer = nil
-                    breathingTimer?.invalidate()
-                    breathingTimer = nil
-                    isRunning = false
-                    isBreathing = false
-                    
-                    isShowingPostExercise = true
-                } label: {
+                NavigationLink(value: AppRoute.finish) {
                     Text("FINISH")
                         .font(.system(size: 17 * textScale, weight: .bold))
                         .foregroundStyle(.white)
@@ -172,6 +161,17 @@ struct BreathingExerciseView: View {
                             y: 5
                         )
                 }
+                .buttonStyle(.plain)
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        timer?.invalidate()
+                        timer = nil
+                        breathingTimer?.invalidate()
+                        breathingTimer = nil
+                        isRunning = false
+                        isBreathing = false
+                    }
+                )
                 .padding(.top, 52)
                 
                 Spacer()
@@ -392,7 +392,6 @@ struct BreathingExerciseView: View {
                 isRunning = false
                 isBreathing = false
                 isFinished = true
-                isShowingPostExercise = true
             }
         }
         
@@ -433,6 +432,20 @@ struct CircleIconButton: View {
 
 #Preview {
     AppThemeManager {
-        BreathingExerciseView()
+        NavigationStack {
+            BreathingExerciseView()
+                .navigationDestination(for: AppRoute.self) { route in
+                    switch route {
+                    case .finish:
+                        PostExerciseView()
+                        
+                    case .home:
+                        HomePageView()
+                        
+                    default:
+                        EmptyView()
+                    }
+                }
+        }
     }
 }

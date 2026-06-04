@@ -16,7 +16,6 @@ struct WorkoutVideoView: View {
     @State private var showSettings = false
     
     let video: WorkoutVideo
-    @State private var isPresentingBreathing = false
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -66,9 +65,6 @@ struct WorkoutVideoView: View {
                     .zIndex(30)
             }
         }
-        .fullScreenCover(isPresented: $isPresentingBreathing) {
-            BreathingExerciseView()
-        }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -91,9 +87,7 @@ struct WorkoutVideoView: View {
             }
             .ignoresSafeArea(edges: .top)
             
-            Button {
-                isPresentingBreathing = true
-            } label: {
+            NavigationLink(value: AppRoute.breathing) {
                 Text("Cool Down Breathing")
                     .font(.system(size: 17 * textScale, weight: .semibold))
                     .foregroundStyle(.white)
@@ -107,6 +101,8 @@ struct WorkoutVideoView: View {
                         y: 5
                     )
             }
+            
+            .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 20)
         }
@@ -213,6 +209,20 @@ struct WorkoutVideoView: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutVideoView(video: WorkoutData.videos[0])
+        NavigationStack {
+            WorkoutVideoView(video: WorkoutData.videos[0])
+                .navigationDestination(for: AppRoute.self) { route in
+                    switch route {
+                    case .breathing:
+                        BreathingExerciseView()
+                        
+                    case .finish:
+                        PostExerciseView()
+                        
+                    default:
+                        EmptyView()
+                    }
+                }
+        }
     }
 }
