@@ -19,6 +19,7 @@ struct MainScrollView: View {
                     VStack(spacing: 0) {
                         
                         HomePageView(
+                            topPadding: 44,
                             onWorkoutTap: { incomingEnergy in
                                 print(
                                     "MainScrollView received energy state: \(incomingEnergy.title)"

@@ -74,31 +74,15 @@ struct WorkoutVideoView: View {
     }
     
     private var mainContent: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                headerArea
-                
-                VStack(alignment: .center, spacing: 24) {
-                    videoSection
+        ZStack(alignment: .bottom) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    headerArea
                     
-                    stepsSection
-                    
-                    NavigationLink(value: AppRoute.breathing){
-                        Text("Breathing Exercise")
-                            .font(
-                                .system(size: 17 * textScale, weight: .semibold)
-                            )
-                            .foregroundStyle(.white)
-                            .frame(width: 160, height: 15)
-                            .padding(16)
-                            .background(isDark ? darkPeach : peach)
-                            .clipShape(Capsule())
-                            .shadow(
-                                color: (isDark ? darkPeach : peach)
-                                    .opacity(0.30),
-                                radius: 10,
-                                y: 5
-                            )
+                    VStack(alignment: .center, spacing: 24) {
+                        videoSection
+                        
+                        stepsSection
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 32)
@@ -139,7 +123,7 @@ struct WorkoutVideoView: View {
                     subtitle: video.title,
                     description: "Guided by \(video.instructor)"
                 ),
-                flowerOffset: CGSize(width: 80, height: 113)
+                flowerOffset: CGSize(width: 85, height: 100)
             )
             
             HStack {

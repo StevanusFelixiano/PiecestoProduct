@@ -80,6 +80,7 @@ struct WorkoutPlanView: View {
         VStack(spacing: 0) {
             headerArea
                 .frame(height: 240)
+                .padding(.bottom, 24)
             
             VStack(spacing: 34) {
                 VStack(spacing: 32) {
@@ -128,6 +129,7 @@ struct WorkoutPlanView: View {
         .background {
             backgroundView
         }
+        .ignoresSafeArea(edges: .top)
     }
     
     private var headerArea: some View {
@@ -137,7 +139,8 @@ struct WorkoutPlanView: View {
                     title: "WORKOUT PLAN",
                     subtitle: "",
                     description: "We've got you, Mama. Leave the planning to us!"
-                )
+                ),
+                flowerOffset: CGSize(width: 80, height: 115)
             )
             .frame(height: 240)
             .onTapGesture {

@@ -155,7 +155,7 @@ struct BreathingExerciseView: View {
                     isShowingPostExercise = true
                 } label: {
                     Text("FINISH")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 17 * textScale, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 150, height: 52)
                         .background(

@@ -19,7 +19,7 @@ struct HomePageView: View {
     @State private var showSettings = false
     
     @State private var energyProgress: CGFloat = 0.5
-    
+    var topPadding: CGFloat = 0
     var onWorkoutTap: (EnergyState) -> Void = {_ in}
     var onBackTap: () -> Void = {}
     
@@ -36,53 +36,36 @@ struct HomePageView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .topTrailing) {
-                
-                contentArea
-                
-                if showSettings {
-                    Color.black.opacity(0.001)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(
-                                .spring(response: 0.3, dampingFraction: 0.85)
-                            ) {
-                                showSettings = false
-                            }
+        ZStack(alignment: .topTrailing) {
+            contentArea
+            
+            if showSettings {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
+                            showSettings = false
                         }
-                        .zIndex(20)
-                    
-                    SettingsPopoverView()
-                        .frame(width: 280)
-                        .padding(.trailing, 28)
-                        .padding(.top, 20)
-                        .transition(
-                            .scale(scale: 0.92, anchor: .topTrailing)
-                            .combined(with: .opacity)
-                        )
-                        .zIndex(30)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                ZStack {
-                    Image("PlanBackground")
-                        .resizable()
-                        .scaledToFill()
-                        .ignoresSafeArea()
-                    
-                    if isDark {
-                        Color(red: 0.10, green: 0.07, blue: 0.09)
-                            .ignoresSafeArea()
                     }
-                }
+                    .zIndex(20)
+                
+                SettingsPopoverView()
+                    .frame(width: 280)
+                    .padding(.trailing, 28)
+                    .padding(.top, 20)
+                    .transition(
+                        .scale(scale: 0.92, anchor: .topTrailing)
+                        .combined(with: .opacity)
+                    )
+                    .zIndex(30)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             ZStack {
-                Image("OnboardBackground")
+                Image("HomeBackground")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -93,7 +76,6 @@ struct HomePageView: View {
                 }
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
     }
     
     private var contentArea: some View {
@@ -146,7 +128,7 @@ struct HomePageView: View {
                     )
                     .padding(.bottom, 10)
                 
-                Text("Let's do a quick check-in. How is your energy right now?")
+                Text("Let's do a quick check-in.\n How is your energy right now?")
                     .font(.system(size: 17 * textScale))
                     .foregroundStyle(
                         isDark
@@ -157,6 +139,7 @@ struct HomePageView: View {
                     .padding(.horizontal, 32)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 10)
+                
                 
                 Spacer()
                 
@@ -263,7 +246,7 @@ struct HomePageView: View {
                     )
             }
         }
-        .padding(.top, 60)
+        .padding(.top, topPadding)
     }
     
     // MARK: - Safe Area Preference Tracker Hook
