@@ -75,7 +75,6 @@ struct WorkoutVideoView: View {
                     
                     VStack(alignment: .leading, spacing: 24) {
                         videoSection
-                        // YouTubeView(videoId: video.youtubeId)
                         
                         stepsSection
                     }
@@ -177,19 +176,7 @@ struct WorkoutVideoView: View {
     
     private var videoSection: some View {
         ZStack {
-            Color.gray.opacity(0.2)
-                .frame(height: 220)
-                .cornerRadius(20)
-            
-            Button {
-            } label: {
-                Image(systemName: "play.circle.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .foregroundStyle(.white)
-                    .background(Circle().fill(.black.opacity(0.2)))
-            }
+            WorkoutVideoPlayer(videoID: video.youtubeId)
         }
     }
     
@@ -199,6 +186,7 @@ struct WorkoutVideoView: View {
                 .font(.system(size: 18 * textScale, weight: .bold))
                 .foregroundStyle(isDark ? darkPeach : textBrown)
                 .tracking(1.0)
+                .padding(.top, 5)
             
             VStack(alignment: .leading, spacing: 12) {
                 ForEach(video.steps.indices, id: \.self) { index in
