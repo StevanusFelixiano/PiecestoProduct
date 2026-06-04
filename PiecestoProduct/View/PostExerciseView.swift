@@ -10,7 +10,7 @@ import SwiftUI
 struct PostExerciseView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
-    
+    @State private var isShowingHomePage = false
     @AppStorage("textScale") private var textScale = 1.0
     
     @State private var showSettings = false
@@ -47,6 +47,9 @@ struct PostExerciseView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             backgroundView
+        }
+        .fullScreenCover(isPresented: $isShowingHomePage) {
+            HomePageView()
         }
     }
     
@@ -99,7 +102,7 @@ struct PostExerciseView: View {
             .padding(.horizontal, 42)
             
             Button {
-                dismiss()
+                isShowingHomePage = true
             } label: {
                 Text("Back to Home")
                     .font(.system(size: 17 * textScale, weight: .semibold))

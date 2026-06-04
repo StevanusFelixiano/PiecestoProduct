@@ -22,6 +22,10 @@ struct WorkoutVideoView: View {
         colorScheme == .dark
     }
     
+    private var buttonTopPadding: CGFloat {
+        textScale > 1.15 ? 32 : 58
+    }
+    
     private var peach: Color {
         Color(red: 250/255, green: 154/255, blue: 138/255)
     }
@@ -148,7 +152,7 @@ struct WorkoutVideoView: View {
                 .allowsHitTesting(!showSettings)
             }
             .padding(.horizontal, 20)
-            .padding(.top, 58)
+            .padding(.top, buttonTopPadding)
         }
     }
     

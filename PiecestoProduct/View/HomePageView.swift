@@ -75,16 +75,16 @@ struct HomePageView: View {
                 }
             }
             .navigationDestination(for: AppRoute.self) { route in
-                        switch route {
-                        case .plan(let state):
-                            WorkoutPlanView(energyState: state)
-                        case .video(let video):
-                            WorkoutVideoView(video: video)
-                        }
-                    }
+                switch route {
+                case .plan(let state):
+                    WorkoutPlanView(energyState: state)
+                case .video(let video):
+                    WorkoutVideoView(video: video)
+                }
             }
         }
-
+    }
+    
     private var contentArea: some View {
         ZStack{
             VStack(alignment: .center, spacing: -3) {
@@ -134,7 +134,7 @@ struct HomePageView: View {
                         : Color(hex: "5B4428")
                     )
                     .padding(.bottom, 10)
-
+                
                 Text("Let's do a quick check-in. How is your energy right now?")
                     .font(.system(size: 17 * textScale))
                     .foregroundStyle(
@@ -145,6 +145,7 @@ struct HomePageView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
                     .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 10)
                 
                 Spacer()
                 
@@ -156,18 +157,35 @@ struct HomePageView: View {
                     .offset(x: energyState.imageOffset)
                 
                 Spacer()
-                    .padding(.bottom, 30)
+                    .padding(.bottom, 20)
                 
                 ZStack(alignment: .top) {
                     
                     
                     CurvedTopRectangle()
-                        .fill(isDark ? Color(hex: "FF8A7A") : Color(hex: "FA9A8A"))
-                        .ignoresSafeArea(edges: .bottom)
+                        .fill(
+                            isDark
+                            ? LinearGradient(
+                                colors: [
+                                    Color(red: 0.34, green: 0.18, blue: 0.24),
+                                    Color(red: 0.24, green: 0.13, blue: 0.18)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            : LinearGradient(
+                                colors: [
+                                    Color(hex: "FA9A8A"),
+                                    Color(hex: "FA9A8A")
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .ignoresSafeArea(edges: .bottom)
                     
                     VStack(spacing: 30) {
-                        CurvedSlider(progress: $energyProgress)
+                        CurvedSlider(progress: $energyProgress, isDark: isDark)
                             .frame(height: 100)
                             .padding(.top, -20)
                         
@@ -206,7 +224,11 @@ struct HomePageView: View {
                             )
                             .padding(.vertical, 12)
                             .padding(.horizontal, 24)
-                            .background(Color.white)
+                            .background(
+                                isDark
+                                ? Color.white.opacity(0.9)
+                                : Color.white.opacity(0.4)
+                            )
                             .clipShape(Capsule())
                         }
                         .padding(.bottom, 10)
@@ -220,6 +242,43 @@ struct HomePageView: View {
 
 struct CurvedSlider: View {
     @Binding var progress: CGFloat
+    let isDark: Bool
+    
+    private var baseTrackColor: Color {
+        isDark
+        ? Color(red: 0.34, green: 0.18, blue: 0.24)
+        : Color(hex: "FA9A8A")
+    }
+    
+    private var bottomLineColor: Color {
+        isDark
+        ? Color.white.opacity(0.28)
+        : Color(hex: "F8F0E4")
+    }
+    
+    private var topLineColor: Color {
+        isDark
+        ? Color(red: 0.48, green: 0.27, blue: 0.34)
+        : Color(hex: "FA9A8A")
+    }
+    
+    private var sliderGradient: LinearGradient {
+        LinearGradient(
+            colors: isDark
+            ? [
+                Color(red: 0.62, green: 0.27, blue: 0.35),
+                Color(red: 0.74, green: 0.48, blue: 0.30),
+                Color(red: 0.42, green: 0.62, blue: 0.48)
+            ]
+            : [
+                Color(hex: "C45E5E"),
+                Color(hex: "F2EA76"),
+                Color(hex: "80DF91")
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -228,21 +287,11 @@ struct CurvedSlider: View {
             
             ZStack(alignment: .leading) {
                 CurvedTrackPath()
-                    .stroke(Color(hex: "FA9A8A")
-                    )
+                    .stroke(baseTrackColor)
                 
                 CurvedTrackPath()
                     .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "C45E5E"),
-                                Color(hex: "F2EA76"),
-                                Color(hex: "80DF91")
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ),
-
+                        sliderGradient,
                         style: StrokeStyle(lineWidth: 90, lineCap: .square)
                     )
                     .frame(width: sliderWidth, height: 60)
@@ -250,7 +299,7 @@ struct CurvedSlider: View {
                 
                 CurvedTrackPath()
                     .stroke(
-                        Color.white.opacity(0.6),
+                        Color.white.opacity(isDark ? 0.28 : 0.6),
                         style: StrokeStyle(lineWidth: 2, lineCap: .round)
                     )
                     .frame(width: sliderWidth, height: 60)
@@ -258,15 +307,15 @@ struct CurvedSlider: View {
                 
                 CurvedTrackPath()
                     .stroke(
-                        Color(hex: "FA9A8A"),
+                        topLineColor,
                         style: StrokeStyle(lineWidth: 6, lineCap: .round)
                     )
                     .frame(width: width, height: 60)
                     .offset(y: -45)
-                    
+                
                 CurvedTrackPath()
                     .stroke(
-                        Color(hex: "F8F0E4"),
+                        bottomLineColor,
                         style: StrokeStyle(lineWidth: 6, lineCap: .round)
                     )
                     .frame(width: width, height: 70)
@@ -294,9 +343,7 @@ struct CurvedSlider: View {
     
     func calculateYOffset(progress: CGFloat) -> CGFloat {
         let t = progress
-        
         let trueY = 160 * (t * t) - 160 * t + 60
-        
         return trueY - 35
     }
 }
