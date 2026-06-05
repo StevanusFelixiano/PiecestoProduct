@@ -19,6 +19,15 @@ struct HomePageView: View {
     @State private var showSettings = false
     
     @State private var energyProgress: CGFloat = 0.5
+    var topPadding: CGFloat = 0
+    var topBarPadding: CGFloat = 20
+    var settingsPopoverTopPadding: CGFloat = 20
+    var topFlowerSpacing: CGFloat = 20
+    var bottomFlowerSpacing: CGFloat = 40
+    var curvedSectionYOffset: CGFloat = 0
+    var onWorkoutTap: (EnergyState) -> Void = {_ in}
+    var onEnergyChange: (EnergyState) -> Void = { _ in }
+    var onBackTap: () -> Void = {}
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -33,56 +42,51 @@ struct HomePageView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            ZStack(alignment: .topTrailing) {
-                
-                contentArea
-                
-                if showSettings {
-                    Color.black.opacity(0.001)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation(
-                                .spring(response: 0.3, dampingFraction: 0.85)
-                            ) {
-                                showSettings = false
-                            }
+        ZStack(alignment: .topTrailing) {
+            contentArea
+            
+            if showSettings {
+                Color.black.opacity(0.001)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
+                            showSettings = false
                         }
-                        .zIndex(20)
-                    
-                    SettingsPopoverView()
-                        .frame(width: 280)
-                        .padding(.trailing, 28)
-                        .padding(.top, 20)
-                        .transition(
-                            .scale(scale: 0.92, anchor: .topTrailing)
-                            .combined(with: .opacity)
-                        )
-                        .zIndex(30)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background {
-                ZStack {
-                    Image("PlanBackground")
-                        .resizable()
-                        .scaledToFill()
-                        .ignoresSafeArea()
-                    
-                    if isDark {
-                        Color(red: 0.10, green: 0.07, blue: 0.09)
-                            .ignoresSafeArea()
                     }
+                    .zIndex(20)
+                
+                SettingsPopoverView()
+                    .frame(width: 280)
+                    .padding(.trailing, 28)
+                    .padding(.top, settingsPopoverTopPadding)
+                    .transition(
+                        .scale(scale: 0.92, anchor: .topTrailing)
+                        .combined(with: .opacity)
+                    )
+                    .zIndex(30)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            ZStack {
+                Image("HomeBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                
+                if isDark {
+                    Color(red: 0.10, green: 0.07, blue: 0.09)
+                        .ignoresSafeArea()
                 }
             }
-            .navigationDestination(for: AppRoute.self) { route in
-                switch route {
-                case .plan(let state):
-                    WorkoutPlanView(energyState: state)
-                case .video(let video):
-                    WorkoutVideoView(video: video)
-                }
-            }
+        }
+        .onAppear {
+            onEnergyChange(energyState)
+        }
+        .onChange(of: energyState) { oldValue, newValue in
+            onEnergyChange(newValue)
         }
     }
     
@@ -118,7 +122,9 @@ struct HomePageView: View {
                     .opacity(showSettings ? 0 : 1)
                     .allowsHitTesting(!showSettings)
                 }
-                .padding(20)
+                .padding(.horizontal, 20)
+                .padding(.bottom, topBarPadding)
+                .padding(.top, 20)
                 
                 Text("Hi, \(userName.isEmpty ? "Mama" : userName)!")
                     .font(
@@ -136,7 +142,7 @@ struct HomePageView: View {
                     )
                     .padding(.bottom, 10)
                 
-                Text("Let's do a quick check-in. How is your energy right now?")
+                Text("Let's do a quick check-in.\n How is your energy right now?")
                     .font(.system(size: 17 * textScale))
                     .foregroundStyle(
                         isDark
@@ -148,6 +154,7 @@ struct HomePageView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 10)
                 
+                
                 Spacer()
                 
                 Image(energyState.imageName)
@@ -156,9 +163,9 @@ struct HomePageView: View {
                     .frame(width: 300, height: 300)
                     .animation(.spring, value: energyProgress)
                     .offset(x: energyState.imageOffset)
-                
+                    .padding(.bottom, 30)
+
                 Spacer()
-                    .padding(.bottom, 20)
                 
                 ZStack(alignment: .top) {
                     
@@ -209,7 +216,12 @@ struct HomePageView: View {
                         }
                         .animation(.easeInOut, value: energyState)
                         
-                        NavigationLink(value: AppRoute.plan(energyState)) {
+                        Button{
+                            print(
+                                "HomePageView is passing local state: \(energyState.title)"
+                            )
+                            onWorkoutTap(energyState)
+                        } label:{
                             HStack {
                                 Text("WORKOUT")
                                     .font(
@@ -232,11 +244,31 @@ struct HomePageView: View {
                             )
                             .clipShape(Capsule())
                         }
+
                         .padding(.bottom, 10)
                     }
                 }
                 .frame(height: 300)
+                .offset(y: curvedSectionYOffset)
             }
+        }
+        .background {
+            GeometryReader { geometry in
+                Color.clear
+                    .preference(
+                        key: TopInsetPreferenceKey.self,
+                        value: geometry.safeAreaInsets.top
+                    )
+            }
+        }
+        .padding(.top, topPadding)
+    }
+    
+    // MARK: - Safe Area Preference Tracker Hook
+    struct TopInsetPreferenceKey: PreferenceKey {
+        static var defaultValue: CGFloat = 0
+        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+            value = nextValue()
         }
     }
 }
@@ -408,6 +440,7 @@ extension Color {
         )
     }
 }
+
 
 
 #Preview {

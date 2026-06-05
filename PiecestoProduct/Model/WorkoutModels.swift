@@ -8,8 +8,11 @@
 import SwiftUI
 
 enum AppRoute: Hashable {
+    case home
     case plan(EnergyState)
     case video(WorkoutVideo)
+    case breathing
+    case finish
 }
 
 enum EnergyState: Int, CaseIterable, Hashable {
@@ -36,6 +39,16 @@ enum EnergyState: Int, CaseIterable, Hashable {
         case .findingRhythm: return "You're moving through the day steadily. \nListen to your body and take things at a pace that feels right."
         case .feelingGood: return "Your energy is showing up today. \nEnjoy what feels manageable while still making space for yourself."
         case .energized: return "Your body feels ready to move and engage today. \nCelebrate this moment and continue treating yourself with kindness."
+        }
+    }
+    
+    var descriptionWidth: CGFloat {
+        switch self {
+        case .needingRest: return 290
+        case .takingItEasy: return 290
+        case .findingRhythm: return 290
+        case .feelingGood: return 290
+        case .energized: return 320
         }
     }
     

@@ -16,7 +16,6 @@ struct WorkoutVideoView: View {
     @State private var showSettings = false
     
     let video: WorkoutVideo
-    @State private var isPresentingBreathing = false
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -47,7 +46,9 @@ struct WorkoutVideoView: View {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.3, dampingFraction: 0.85)
+                        ) {
                             showSettings = false
                         }
                     }
@@ -64,9 +65,6 @@ struct WorkoutVideoView: View {
                     .zIndex(30)
             }
         }
-        .fullScreenCover(isPresented: $isPresentingBreathing) {
-            BreathingExerciseView()
-        }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
     }
@@ -77,7 +75,7 @@ struct WorkoutVideoView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     headerArea
                     
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(alignment: .center, spacing: 24) {
                         videoSection
                         
                         stepsSection
@@ -89,9 +87,7 @@ struct WorkoutVideoView: View {
             }
             .ignoresSafeArea(edges: .top)
             
-            Button {
-                isPresentingBreathing = true
-            } label: {
+            NavigationLink(value: AppRoute.breathing) {
                 Text("Cool Down Breathing")
                     .font(.system(size: 17 * textScale, weight: .semibold))
                     .foregroundStyle(.white)
@@ -105,6 +101,8 @@ struct WorkoutVideoView: View {
                         y: 5
                     )
             }
+            
+            .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)
             .padding(.bottom, 20)
         }
@@ -121,7 +119,7 @@ struct WorkoutVideoView: View {
                     subtitle: video.title,
                     description: "Guided by \(video.instructor)"
                 ),
-                flowerOffset: CGSize(width: 80, height: 113)
+                flowerOffset: CGSize(width: 85, height: 100)
             )
             
             HStack {
@@ -211,6 +209,20 @@ struct WorkoutVideoView: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutVideoView(video: WorkoutData.videos[0])
+        NavigationStack {
+            WorkoutVideoView(video: WorkoutData.videos[0])
+                .navigationDestination(for: AppRoute.self) { route in
+                    switch route {
+                    case .breathing:
+                        BreathingExerciseView()
+                        
+                    case .finish:
+                        PostExerciseView()
+                        
+                    default:
+                        EmptyView()
+                    }
+                }
+        }
     }
 }

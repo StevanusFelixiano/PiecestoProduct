@@ -15,7 +15,10 @@ struct WorkoutPlanView: View {
     
     @State private var showSettings = false
     
-    let energyState: EnergyState
+    var onBackTap: () -> Void = {}
+    
+    @Binding var energyState: EnergyState
+
     @State private var selectedVideo: WorkoutVideo?
     
     private var isDark: Bool {
@@ -58,10 +61,16 @@ struct WorkoutPlanView: View {
             }
         }
         .onAppear {
-            // When the view appears, grab a random video matching the user's energy!
             if selectedVideo == nil {
                 selectedVideo = WorkoutData.getRandomVideo(for: energyState)
             }
+        }
+        .onChange(of: energyState) { oldState,
+            newState in
+            print(
+                "WorkoutPlanView detected state shift: Recalculating recommendation cards for \(newState.title)"
+            )
+            selectedVideo = WorkoutData.getRandomVideo(for: newState)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -70,6 +79,8 @@ struct WorkoutPlanView: View {
     private var mainContent: some View {
         VStack(spacing: 0) {
             headerArea
+                .frame(height: 240)
+                .padding(.bottom, 24)
             
             VStack(spacing: 34) {
                 VStack(spacing: 32) {
@@ -101,38 +112,44 @@ struct WorkoutPlanView: View {
                             .background(isDark ? darkPeach : peach)
                             .clipShape(Capsule())
                             .shadow(
-                                color: (isDark ? darkPeach : peach).opacity(0.30),
+                                color: (isDark ? darkPeach : peach)
+                                    .opacity(0.30),
                                 radius: 10,
                                 y: 5
                             )
                     }
                     .padding(.top, 24)
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(.top, -24)
+            .padding(.top, 40)
             Spacer()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             backgroundView
         }
+        .ignoresSafeArea(edges: .top)
     }
     
     private var headerArea: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topTrailing){
             Header(
                 content: HeaderContent(
                     title: "WORKOUT PLAN",
                     subtitle: "",
                     description: "Leave the planning to us!"
                 ),
-                flowerOffset: CGSize(width: 70, height: 120)
+                flowerOffset: CGSize(width: 80, height: 115)
             )
-            
-            HStack {
-                Button {
-                    dismiss()
-                } label: {
+            .frame(height: 240)
+            .onTapGesture {
+                onBackTap()
+            }
+            HStack{
+                Button{
+                    onBackTap()
+                } label:{
                     Image(systemName: "chevron.left")
                         .font(.system(size: 22, weight: .bold))
                         .foregroundStyle(.white)
@@ -156,6 +173,7 @@ struct WorkoutPlanView: View {
                 .opacity(showSettings ? 0 : 1)
                 .allowsHitTesting(!showSettings)
             }
+            .padding (.top, 60)
             .padding(.horizontal, 20)
         }
     }
@@ -198,10 +216,10 @@ struct WorkoutPlanView: View {
 
 struct WorkoutPlanRow: View {
     let iconName: String
-        let title: String
-        let subtitle: String
-        let textScale: Double
-        let isDark: Bool
+    let title: String
+    let subtitle: String
+    let textScale: Double
+    let isDark: Bool
     
     private var textBrown: Color {
         Color(red: 0.36, green: 0.27, blue: 0.24)
@@ -247,6 +265,8 @@ struct WorkoutPlanRow: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutPlanView(energyState: .findingRhythm)
+        WorkoutPlanView(
+            onBackTap: {},
+            energyState: .constant(.findingRhythm))
     }
 }
