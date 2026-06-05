@@ -78,11 +78,14 @@ struct WorkoutVideoView: View {
                     VStack(alignment: .center, spacing: 24) {
                         videoSection
                         
-                        stepsSection
+                        
                     }
                     .padding(.horizontal, 24)
                     .padding(.top, 32)
-                    .padding(.bottom, 120)
+                    .padding(.bottom, 20)
+                    stepsSection
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 10)
                 }
             }
             .ignoresSafeArea(edges: .top)

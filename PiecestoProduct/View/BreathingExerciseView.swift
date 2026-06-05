@@ -144,13 +144,18 @@ struct BreathingExerciseView: View {
                 
                 Spacer()
                 
-                Text(formattedTime)
-                    .font(.system(size: 40 * textScale, weight: .semibold, design: .rounded))
-                    .foregroundStyle(
-                        isDark
-                        ? Color.white.opacity(0.92)
-                        : Color(red: 0.32, green: 0.25, blue: 0.20)
-                    )
+                ZStack {
+                    Text(formattedTime)
+                        .id(remainingSeconds)
+                        .font(.system(size: 40 * textScale, weight: .semibold, design: .rounded))
+                        .foregroundStyle(
+                            isDark
+                            ? Color.white.opacity(0.92)
+                            : Color(red: 0.32, green: 0.25, blue: 0.20)
+                        )
+                        .transition(.opacity)
+                }
+                .animation(.easeInOut(duration: 0.35), value: remainingSeconds)
                 
                 
                 Text(breathingLabel)
@@ -260,7 +265,7 @@ struct BreathingExerciseView: View {
                     .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, 28)
+            .padding(.horizontal, 16)
             
             Spacer()
             

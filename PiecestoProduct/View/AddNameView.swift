@@ -158,7 +158,7 @@ struct AddNameView: View {
                 Text("Continue")
                     .font(.system(size: 17 * textScale, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
+                    .frame(width: 120)
                     .padding()
                     .background(accentColor)
                     .clipShape(Capsule())

@@ -147,17 +147,19 @@ struct WorkoutPlanView: View {
                 onBackTap()
             }
             HStack{
+                Spacer()
+                    .frame(width: 140)
                 Button{
                     onBackTap()
                 } label:{
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 22, weight: .bold))
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(.white)
-                        .frame(width: 48, height: 48)
+                        .frame(width: 75, height: 38)
                         .background(Color(red: 0.980, green: 0.604, blue: 0.541))
-                        .clipShape(Circle())
+                        .clipShape(Capsule())
                         .overlay {
-                            Circle()
+                            Capsule()
                                 .stroke(.white.opacity(0.35), lineWidth: 1)
                         }
                         .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
@@ -198,7 +200,7 @@ struct WorkoutPlanView: View {
                     maxHeight: .infinity,
                     alignment: .bottomTrailing
                 )
-                .offset(x: -208, y: 7)
+                .offset(x: -208, y: 15)
                 .opacity(1.1)
                 .ignoresSafeArea()
             
