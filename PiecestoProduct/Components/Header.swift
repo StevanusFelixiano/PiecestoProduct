@@ -97,7 +97,7 @@ struct Header: View {
     
     private var headerMainColor: Color {
         isDark
-        ? Color(red: 0.28, green: 0.15, blue: 0.20)
+        ? Color(red: 0.24, green: 0.13, blue: 0.18)
         : Color(hex: "#FA9A8A")
     }
     

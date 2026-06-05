@@ -21,7 +21,10 @@ struct BreathingExerciseView: View {
     @State private var remainingSeconds = 180
     @State private var timer: Timer?
     @State private var breathingTimer: Timer?
-    @State private var audioPlayer: AVAudioPlayer?
+    
+    @State private var audioPlayerA: AVAudioPlayer?
+    @State private var audioPlayerB: AVAudioPlayer?
+    @State private var usePlayerA = true
     
     @AppStorage("textScale") private var textScale = 1.0
     
@@ -79,15 +82,6 @@ struct BreathingExerciseView: View {
         }
     }
     
-    private func playBreathSound(isIn: Bool) {
-        let soundName = isIn ? "breath-in" : "breath-out"
-        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else { return }
-        
-        audioPlayer?.stop()
-        audioPlayer = try? AVAudioPlayer(contentsOf: url)
-        audioPlayer?.play()
-    }
-    
     private var breathingLabel: String {
         guard isRunning else { return "One breath at a time..." }
         return isBreathing ? "Breathe In" : "Breathe Out"
@@ -122,7 +116,7 @@ struct BreathingExerciseView: View {
                             .font(.system(size: 48, weight: .bold))
                             .foregroundStyle(
                                 isDark
-                                ? Color.white.opacity(0.92)
+                                ? Color(red: 0.82, green: 0.43, blue: 0.52)
                                 : Color(red: 0.32, green: 0.25, blue: 0.20))
                             .frame(width: 90, height: 90)
                             .background(
@@ -401,11 +395,66 @@ struct BreathingExerciseView: View {
         onFinish()
     }
     
+    private func setupAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session error: \(error)")
+        }
+    }
+
+    private func playBreathSound(isIn: Bool) {
+        let soundName = isIn ? "breath-in" : "breath-out"
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
+            print("Sound file not found: \(soundName).mp3")
+            return
+        }
+        
+        do {
+            let incomingPlayer = try AVAudioPlayer(contentsOf: url)
+            incomingPlayer.volume = 0
+            incomingPlayer.prepareToPlay()
+            incomingPlayer.play()
+            
+            if usePlayerA {
+                audioPlayerA = incomingPlayer
+            } else {
+                audioPlayerB = incomingPlayer
+            }
+            
+            let outgoing = usePlayerA ? audioPlayerB : audioPlayerA
+            let incoming = incomingPlayer
+            usePlayerA.toggle()
+            
+            var step = 0
+            let steps = 30
+            let interval = 1.5 / Double(steps)
+            
+            Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { t in
+                step += 1
+                let progress = Float(step) / Float(steps)
+                incoming.volume = progress
+                outgoing?.volume = 1.0 - progress
+                
+                if step >= steps {
+                    outgoing?.stop()
+                    incoming.volume = 1.0
+                    t.invalidate()
+                }
+            }
+        } catch {
+            print("Audio player error: \(error)")
+        }
+    }
+    
     private func startTimer() {
+        setupAudioSession()
         isFinished = false
         
         isRunning = true
         isBreathing = true
+        playBreathSound(isIn: true)
         
         timer?.invalidate()
         
@@ -423,6 +472,7 @@ struct BreathingExerciseView: View {
             withAnimation(.easeInOut(duration: 2.8)) {
                 isBreathing.toggle()
             }
+            playBreathSound(isIn: isBreathing)
         }
     }
     
