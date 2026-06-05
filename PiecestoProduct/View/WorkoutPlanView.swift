@@ -124,7 +124,7 @@ struct WorkoutPlanView: View {
                 content: HeaderContent(
                     title: "WORKOUT PLAN",
                     subtitle: "",
-                    description: "We've got you, Mama. Leave the planning to us!"
+                    description: "Leave the planning to us!"
                 ),
                 flowerOffset: CGSize(width: 70, height: 120)
             )

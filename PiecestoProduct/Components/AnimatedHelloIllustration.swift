@@ -113,7 +113,7 @@ struct AnimatedHelloIllustration: View {
                 .offset(y: floatAvatar ? -7 : 7)
                 .padding(.vertical, 14)
                 
-                Text("Hi, Mama")
+                Text("Hi, Mother")
                     .font(.headline)
                     .foregroundStyle(
                         isDark

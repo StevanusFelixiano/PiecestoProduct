@@ -90,7 +90,7 @@ struct PostExerciseView: View {
                     )
                     .multilineTextAlignment(.center)
                 
-                Text("We hope you're feeling a bit more like yourself after taking this time for yourself")
+                Text("We hope you're feeling better after taking this time for yourself")
                     .font(.system(size: 17 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
