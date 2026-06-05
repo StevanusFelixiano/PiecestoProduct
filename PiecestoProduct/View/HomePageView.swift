@@ -71,7 +71,7 @@ struct HomePageView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background {
             ZStack {
-                Image("HomeBackground")
+                Image("OnboardBackground")
                     .resizable()
                     .scaledToFill()
                     .ignoresSafeArea()
@@ -94,14 +94,6 @@ struct HomePageView: View {
         ZStack{
             VStack(alignment: .center, spacing: -3) {
                 HStack{
-                    Text("YOUR ENERGY TODAY")
-                        .font(.system(size: 20 * textScale, weight: .bold))
-                        .foregroundStyle(
-                            isDark
-                            ? Color(red: 1.00, green: 0.84, blue: 0.86)
-                            : Color(hex: "5B4428")
-                        )
-                    
                     Spacer()
                     Button {
                         withAnimation(
@@ -110,22 +102,14 @@ struct HomePageView: View {
                             showSettings = true
                         }
                     } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .background(Color(red: 0.980, green: 0.604, blue: 0.541))
-                            .clipShape(Circle())
-                            .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
+                        MenuButton()
                     }
                     .buttonStyle(.plain)
                     .opacity(showSettings ? 0 : 1)
                     .allowsHitTesting(!showSettings)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, topBarPadding)
-                .padding(.top, 20)
-                
+                .padding(topBarPadding)
+                .padding(.bottom, 10)
                 Text("Hi, \(userName.isEmpty ? "Mama" : userName)!")
                     .font(
                         Font
@@ -223,7 +207,7 @@ struct HomePageView: View {
                             onWorkoutTap(energyState)
                         } label:{
                             HStack {
-                                Text("WORKOUT")
+                                Text("LET'S WORKOUT")
                                     .font(
                                         .system(
                                             size: 14 * textScale,
@@ -233,18 +217,20 @@ struct HomePageView: View {
                                 Image(systemName: "chevron.down")
                             }
                             .foregroundStyle(
-                                Color(red: 0.29, green: 0.24, blue: 0.20)
+                                Color.white
                             )
                             .padding(.vertical, 12)
                             .padding(.horizontal, 24)
                             .background(
-                                isDark
-                                ? Color.white.opacity(0.9)
-                                : Color.white.opacity(0.4)
+                                Color(hex: "FA9A8A")
                             )
                             .clipShape(Capsule())
+                            .overlay {
+                                Capsule()
+                                    .stroke(Color.white, lineWidth: 2)
+                            }
+                            .shadow(radius: 8)
                         }
-
                         .padding(.bottom, 10)
                     }
                 }
@@ -304,9 +290,9 @@ struct CurvedSlider: View {
                 Color(red: 0.42, green: 0.62, blue: 0.48)
             ]
             : [
-                Color(hex: "C45E5E"),
-                Color(hex: "F2EA76"),
-                Color(hex: "80DF91")
+                Color(hex: "D4857A"),
+                Color(hex: "F1DF89"),
+                Color(hex: "9EE2A0")
             ],
             startPoint: .leading,
             endPoint: .trailing
@@ -354,22 +340,38 @@ struct CurvedSlider: View {
                     .frame(width: width, height: 70)
                     .offset(y: 45)
                 
-                Image("WhiteFlower")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 65, height: 65)
-                    .shadow(radius: 3)
-                    .offset(x: (progress * sliderWidth) - 23)
-                    .offset(y: 5 + calculateYOffset(progress: progress))
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                let newProgress = (
-                                    value.location.x - 10
-                                ) / sliderWidth
-                                progress = min(max(newProgress, 0.05), 0.95)
-                            }
-                    )
+                HStack{
+                    Image(systemName: "chevron.left")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color.white)
+                        .frame(width: 15, height: 15)
+                        .shadow(radius: 10)
+                        .padding(.horizontal, -10)
+                    Image("WhiteFlower")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 65, height: 65)
+                        .shadow(radius: 3)
+                    Image(systemName: "chevron.right")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color.white)
+                        .frame(width: 15, height: 15)
+                        .shadow(radius: 10)
+                        .padding(.horizontal, -10)
+                }
+                .offset(x: (progress * sliderWidth) - 33)
+                .offset(y: 5 + calculateYOffset(progress: progress))
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            let newProgress = (
+                                value.location.x - 10
+                            ) / sliderWidth
+                            progress = min(max(newProgress, 0.05), 0.95)
+                        }
+                )
             }
         }
     }
