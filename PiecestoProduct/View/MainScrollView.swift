@@ -86,7 +86,9 @@ struct MainScrollView: View {
                         WorkoutVideoView(video: selectedVideo)
                         
                     case .breathing:
-                        BreathingExerciseView()
+                        BreathingExerciseView {
+                                path.append(AppRoute.finish)
+                            }
                         
                     case .finish:
                         PostExerciseView {

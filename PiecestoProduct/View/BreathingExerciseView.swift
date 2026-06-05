@@ -12,6 +12,8 @@ struct BreathingExerciseView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
+    var onFinish: () -> Void = {}
+    
     @State private var isBreathing = false
     @State private var isRunning = false
     @State private var isFinished = false
@@ -142,7 +144,9 @@ struct BreathingExerciseView: View {
                     .animation(.easeInOut(duration: 0.8), value: breathingLabel)
                     .padding(.top, 22)
                 
-                NavigationLink(value: AppRoute.finish) {
+                Button {
+                    finishExercise()
+                } label: {
                     Text("FINISH")
                         .font(.system(size: 17 * textScale, weight: .bold))
                         .foregroundStyle(.white)
@@ -162,16 +166,6 @@ struct BreathingExerciseView: View {
                         )
                 }
                 .buttonStyle(.plain)
-                .simultaneousGesture(
-                    TapGesture().onEnded {
-                        timer?.invalidate()
-                        timer = nil
-                        breathingTimer?.invalidate()
-                        breathingTimer = nil
-                        isRunning = false
-                        isBreathing = false
-                    }
-                )
                 .padding(.top, 52)
                 
                 Spacer()
@@ -241,7 +235,8 @@ struct BreathingExerciseView: View {
                     )
                     .clipShape(Circle())
                     .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
-            }            .buttonStyle(.plain)
+            }
+            .buttonStyle(.plain)
             .padding(.horizontal, 28)
             
             Spacer()
@@ -373,8 +368,20 @@ struct BreathingExerciseView: View {
         }
     }
     
-    private func startTimer() {
+    private func finishExercise() {
+        timer?.invalidate()
+        timer = nil
+        breathingTimer?.invalidate()
+        breathingTimer = nil
         
+        isRunning = false
+        isBreathing = false
+        isFinished = true
+        
+        onFinish()
+    }
+    
+    private func startTimer() {
         isFinished = false
         remainingSeconds = 180
         
@@ -388,10 +395,7 @@ struct BreathingExerciseView: View {
                 remainingSeconds -= 1
             } else {
                 currentTimer.invalidate()
-                timer = nil
-                isRunning = false
-                isBreathing = false
-                isFinished = true
+                finishExercise()
             }
         }
         
@@ -402,6 +406,7 @@ struct BreathingExerciseView: View {
             }
         }
     }
+    
     private func pauseTimer() {
         isRunning = false
         breathingTimer?.invalidate()
@@ -432,20 +437,27 @@ struct CircleIconButton: View {
 
 #Preview {
     AppThemeManager {
-        NavigationStack {
-            BreathingExerciseView()
-                .navigationDestination(for: AppRoute.self) { route in
-                    switch route {
-                    case .finish:
-                        PostExerciseView()
-                        
-                    case .home:
-                        HomePageView()
-                        
-                    default:
-                        EmptyView()
-                    }
+        BreathingPreviewWrapper()
+    }
+}
+
+private struct BreathingPreviewWrapper: View {
+    @State private var path = NavigationPath()
+    
+    var body: some View {
+        NavigationStack(path: $path) {
+            BreathingExerciseView {
+                path.append(AppRoute.finish)
+            }
+            .navigationDestination(for: AppRoute.self) { route in
+                switch route {
+                case .finish:
+                    PostExerciseView()
+                    
+                default:
+                    EmptyView()
                 }
+            }
         }
     }
 }
