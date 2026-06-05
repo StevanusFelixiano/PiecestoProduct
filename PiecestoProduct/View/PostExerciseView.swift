@@ -55,7 +55,6 @@ struct PostExerciseView: View {
         VStack {
             HStack {
                 Spacer()
-                
                 Button {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
                         showSettings = true
@@ -70,23 +69,25 @@ struct PostExerciseView: View {
             .padding(.horizontal, 20)
             
             Spacer()
-                .frame(height: 60)
+                .frame(height: 120)
             
             Image("FullFlower")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 270, height: 270)
                 .opacity(isDark ? 0.85 : 1.0)
+                .padding(.bottom, -10)
             
-            VStack(spacing: 8) {
-                Text("You did it! Thank you for prioritizing yourself today.")
-                    .font(.system(size: 17 * textScale, weight: .regular))
+            VStack(spacing: 0) {
+                Text("Congrats! You already finished today’s exercise.")
+                    .font(.system(size: 16 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.88)
                         : Color(red: 0.36, green: 0.24, blue: 0.25)
                     )
                     .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
                 
                 Text("We hope you're feeling better after taking this time for yourself")
                     .font(.system(size: 17 * textScale, weight: .regular))
@@ -97,7 +98,7 @@ struct PostExerciseView: View {
                     )
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 42)
+            .padding(.horizontal, 22)
             
             Button {
                 onBackHome()
@@ -123,7 +124,8 @@ struct PostExerciseView: View {
             }
             .buttonStyle(.plain)
             .padding(.horizontal, 52)
-            .padding(.top, 40)
+            .padding(.top, 25)
+            .frame(width: 270, height: 54)
             
             Spacer()
         }

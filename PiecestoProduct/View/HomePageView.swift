@@ -110,11 +110,11 @@ struct HomePageView: View {
                             showSettings = true
                         }
                     } label: {
-                        Image(systemName: "gearshape.fill")
+                        Image(systemName: "line.3.horizontal")
                             .font(.system(size: 22, weight: .bold))
                             .foregroundStyle(.white)
                             .frame(width: 44, height: 44)
-                            .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                            .background(Color(red: 0.980, green: 0.604, blue: 0.541))
                             .clipShape(Circle())
                             .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
                     }

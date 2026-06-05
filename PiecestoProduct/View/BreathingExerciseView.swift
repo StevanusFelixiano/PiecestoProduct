@@ -29,6 +29,14 @@ struct BreathingExerciseView: View {
         colorScheme == .dark
     }
     
+    private var peach: Color {
+        Color(red: 250/255, green: 154/255, blue: 138/255)
+    }
+    
+    private var darkPeach: Color {
+        Color(red: 0.82, green: 0.43, blue: 0.52)
+    }
+    
     private var formattedTime: String {
         let minutes = remainingSeconds / 60
         let seconds = remainingSeconds % 60
@@ -82,7 +90,7 @@ struct BreathingExerciseView: View {
     
     private var breathingLabel: String {
         guard isRunning else { return "One breath at a time..." }
-        return isBreathing ? "Breathe In..." : "Breathe Out..."
+        return isBreathing ? "Breathe In" : "Breathe Out"
     }
     
     private var mainContent: some View {
@@ -92,50 +100,61 @@ struct BreathingExerciseView: View {
             VStack {
                 topBar
                 
-                Text("A MOMENT TO BREATHE")
+                Text("COOLDOWN BREATHING")
                     .font(.system(size: 26 * textScale, weight: .bold))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.92)
                         : Color(red: 0.32, green: 0.25, blue: 0.20)
                     )
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 28)
+                
                     .padding(.top, 16)
                 
                 Spacer()
                 
-                breathingCircle
                 
-                Button {
-                    toggleTimer()
-                } label: {
-                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                        .font(.system(size: 48, weight: .bold))
-                        .foregroundStyle(
-                            isDark
-                            ? Color(red: 0.92, green: 0.42, blue: 0.56)
-                            : Color(red: 0.36, green: 0.28, blue: 0.20)
-                        )
-                        .frame(width: 108, height: 108)
-                        .background(
-                            isDark
-                            ? Color.white.opacity(0.90)
-                            : Color.white.opacity(0.78)
-                        )
-                        .clipShape(Circle())
-                        .shadow(
-                            color: isDark
-                            ? Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.28)
-                            : .black.opacity(0.08),
-                            radius: 12,
-                            y: 6
-                        )
+                ZStack {
+                    breathingCircle
+                    Button {
+                        toggleTimer()
+                    } label: {
+                        Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                            .font(.system(size: 48, weight: .bold))
+                            .foregroundStyle(
+                                isDark
+                                ? Color.white.opacity(0.92)
+                                : Color(red: 0.32, green: 0.25, blue: 0.20))
+                            .frame(width: 90, height: 90)
+                            .background(
+                                isDark
+                                ? Color.white.opacity(0.90)
+                                : Color.white.opacity(0.78)
+                            )
+                            .clipShape(Circle())
+                            .shadow(
+                                color: isDark
+                                ? Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.28)
+                                : .black.opacity(0.08),
+                                radius: 12,
+                                y: 6
+                            )
+                    }
+                    
                 }
-                .padding(.top, 36)
+                
+                Spacer()
+                
+                Text(formattedTime)
+                    .font(.system(size: 40 * textScale, weight: .semibold, design: .rounded))
+                    .foregroundStyle(
+                        isDark
+                        ? Color.white.opacity(0.92)
+                        : Color(red: 0.32, green: 0.25, blue: 0.20)
+                    )
+                
                 
                 Text(breathingLabel)
-                    .font(.system(size: 26 * textScale, weight: .regular))
+                    .font(.system(size: 24 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.78)
@@ -231,9 +250,13 @@ struct BreathingExerciseView: View {
                     .background(
                         isDark
                         ? Color.white.opacity(0.20)
-                        : Color(red: 0.63, green: 0.58, blue: 0.73)
+                        : Color(red: 0.980, green: 0.604, blue: 0.541)
                     )
                     .clipShape(Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(.white.opacity(0.35), lineWidth: 1)
+                    }
                     .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
             }
             .buttonStyle(.plain)
@@ -348,14 +371,6 @@ struct BreathingExerciseView: View {
                     : .easeInOut(duration: 0.3),
                     value: isBreathing
                 )
-            
-            Text(formattedTime)
-                .font(.system(size: 46 * textScale, weight: .semibold, design: .rounded))
-                .foregroundStyle(
-                    isDark
-                    ? Color.white.opacity(0.92)
-                    : Color(red: 0.32, green: 0.25, blue: 0.20)
-                )
         }
         .frame(width: 270, height: 270)
     }
@@ -383,7 +398,6 @@ struct BreathingExerciseView: View {
     
     private func startTimer() {
         isFinished = false
-        remainingSeconds = 180
         
         isRunning = true
         isBreathing = true
