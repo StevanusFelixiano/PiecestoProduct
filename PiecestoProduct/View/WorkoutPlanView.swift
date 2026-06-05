@@ -156,13 +156,23 @@ struct WorkoutPlanView: View {
                         .font(.system(size: 20, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 75, height: 38)
-                        .background(Color(red: 0.980, green: 0.604, blue: 0.541))
+                        .background(
+                            isDark
+                            ? Color.white.opacity(0.20)
+                            : Color(red: 0.980, green: 0.604, blue: 0.541)
+                        )
                         .clipShape(Capsule())
                         .overlay {
                             Capsule()
                                 .stroke(.white.opacity(0.35), lineWidth: 1)
                         }
-                        .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
+                        .shadow(
+                            color: isDark
+                            ? Color.black.opacity(0.25)
+                            : Color.black.opacity(0.12),
+                            radius: 6,
+                            y: 3
+                        )
                 }
                 .buttonStyle(.plain)
                 

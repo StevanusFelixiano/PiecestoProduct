@@ -222,7 +222,9 @@ struct HomePageView: View {
                             .padding(.vertical, 12)
                             .padding(.horizontal, 24)
                             .background(
-                                Color(hex: "FA9A8A")
+                                isDark
+                                ? Color(red: 0.82, green: 0.43, blue: 0.52)
+                                : Color(hex: "FA9A8A")
                             )
                             .clipShape(Capsule())
                             .overlay {
