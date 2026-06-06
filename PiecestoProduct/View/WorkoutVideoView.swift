@@ -122,7 +122,7 @@ struct WorkoutVideoView: View {
                     subtitle: video.title,
                     description: "Guided by \(video.instructor)"
                 ),
-                flowerOffset: CGSize(width: 85, height: 100)
+                flowerOffset: CGSize(width: 85, height: 110)
             )
             
             HStack {

@@ -94,7 +94,7 @@ struct BreathingExerciseView: View {
             VStack {
                 topBar
                 
-                Text("COOLDOWN BREATHING")
+                Text("COOLDOWN")
                     .font(.system(size: 26 * textScale, weight: .bold))
                     .foregroundStyle(
                         isDark

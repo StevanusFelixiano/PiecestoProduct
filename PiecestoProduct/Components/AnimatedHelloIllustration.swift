@@ -48,20 +48,20 @@ struct AnimatedHelloIllustration: View {
             }
             
             FlowerView(
-                size: 40,
+                size: 42,
                 petalColor: isDark
-                ? Color(red: 1.0, green: 0.36, blue: 0.52).opacity(0.95)
-                : Color.pink.opacity(0.75)
+                ? Color(red: 0.92, green: 0.42, blue: 0.56)
+                : Color(red: 0.98, green: 0.62, blue: 0.58)
             )
             .offset(x: -78, y: -58)
             .offset(y: floatFlowerLeft ? -7 : 7)
             .rotationEffect(.degrees(floatFlowerLeft ? -7 : 7))
             
             FlowerView(
-                size: 32,
+                size: 34,
                 petalColor: isDark
-                ? Color(red: 0.82, green: 0.48, blue: 1.0).opacity(0.95)
-                : Color.purple.opacity(0.6)
+                ? Color(red: 0.58, green: 0.70, blue: 0.95)
+                : Color(red: 0.56, green: 0.78, blue: 0.92)
             )
             .offset(x: 82, y: 42)
             .offset(y: floatFlowerRight ? 7 : -7)
@@ -101,14 +101,15 @@ struct AnimatedHelloIllustration: View {
                         )
                     
                     Image(systemName: "hand.wave.fill")
-                        .font(.system(size: 24))
+                        .font(.system(size: 23))
                         .foregroundStyle(
                             isDark
-                            ? Color(red: 1.0, green: 0.58, blue: 0.23)
-                            : Color.orange.opacity(0.95)
+                            ? Color(red: 1.0, green: 0.62, blue: 0.42)
+                            : Color(red: 0.95, green: 0.58, blue: 0.48)
                         )
-                        .offset(x: 40, y: -4)
-                        .rotationEffect(.degrees(waveHand ? 18 : -12), anchor: .bottomLeading)
+                        .scaleEffect(x: -1, y: 1)
+                        .offset(x: 45, y: -6)
+                        .rotationEffect(.degrees(waveHand ? 10 : -12), anchor: .bottomLeading)
                 }
                 .offset(y: floatAvatar ? -7 : 7)
                 .padding(.vertical, 14)
@@ -140,10 +141,9 @@ struct AnimatedHelloIllustration: View {
                 .opacity(showHiBubble ? 1 : 0.65)
         }
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.45).repeatForever(autoreverses: true)) {
+            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)) {
                 waveHand = true
             }
-            
             withAnimation(.easeInOut(duration: 1.8).repeatForever(autoreverses: true)) {
                 floatAvatar = true
             }
@@ -169,18 +169,52 @@ struct FlowerView: View {
     
     var body: some View {
         ZStack {
-            ForEach(0..<6, id: \.self) { index in
-                Circle()
-                    .fill(petalColor)
-                    .frame(width: size * 0.34, height: size * 0.34)
-                    .offset(y: -size * 0.28)
-                    .rotationEffect(.degrees(Double(index) * 60))
+            ForEach(0..<8, id: \.self) { index in
+                PetalShape()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                petalColor.opacity(5),
+                                Color.white.opacity(0.28)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: size * 0.25, height: size * 0.56)
+                    .offset(y: -size * 0.22)
+                    .rotationEffect(.degrees(Double(index) * 45))
             }
             
             Circle()
-                .fill(Color.yellow.opacity(0.95))
-                .frame(width: size * 0.24, height: size * 0.24)
+                .fill(Color.white.opacity(0.45))
+                .frame(width: size * 0.18, height: size * 0.18)
         }
+        .blur(radius: 0.2)
+    }
+}
+
+struct PetalShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        
+        let midX = rect.midX
+        let maxY = rect.maxY
+        
+        path.move(to: CGPoint(x: midX, y: rect.minY))
+        path.addCurve(
+            to: CGPoint(x: midX, y: maxY),
+            control1: CGPoint(x: rect.minX - rect.width * 0.15, y: rect.height * 0.25),
+            control2: CGPoint(x: rect.minX, y: rect.height * 0.82)
+        )
+        path.addCurve(
+            to: CGPoint(x: midX, y: rect.minY),
+            control1: CGPoint(x: rect.maxX, y: rect.height * 0.82),
+            control2: CGPoint(x: rect.maxX + rect.width * 0.15, y: rect.height * 0.25)
+        )
+        
+        path.closeSubpath()
+        return path
     }
 }
 

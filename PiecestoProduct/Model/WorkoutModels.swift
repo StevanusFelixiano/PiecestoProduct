@@ -34,11 +34,11 @@ enum EnergyState: Int, CaseIterable, Hashable {
     
     var description: String {
         switch self {
-        case .needingRest: return "Your body has been carrying a lot lately. \nToday may be a day for slowing down and giving yourself extra care."
-        case .takingItEasy: return "You have some energy, but your body may still be asking for gentle movement and moments of rest."
-        case .findingRhythm: return "You're moving through the day steadily. \nListen to your body and take things at a pace that feels right."
-        case .feelingGood: return "Your energy is showing up today. \nEnjoy what feels manageable while still making space for yourself."
-        case .energized: return "Your body feels ready to move and engage today. \nCelebrate this moment and continue treating yourself with kindness."
+        case .needingRest: return "You've been carrying a lot lately. \nToday might be a good day to slow down, \n take a deep breath and let yourself be cared too."
+        case .takingItEasy: return "You've got a little energy to work with today.\n Gentle movement and small moments for \n yourself are more than enough"
+        case .findingRhythm: return "You’re finding your balance today. \nListen to what your body needs and move \n in a way that feels supportive, not demanding."
+        case .feelingGood: return "Your energy is showing up today. \nEnjoy what feels manageable while still \n making space for yourself."
+        case .energized: return "Your body feels ready to move and engage today. \nCelebrate this moment and continue \n treating yourself with kindness."
         }
     }
     

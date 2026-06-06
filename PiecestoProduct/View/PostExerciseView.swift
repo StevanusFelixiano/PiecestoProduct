@@ -125,7 +125,8 @@ struct PostExerciseView: View {
             .buttonStyle(.plain)
             .padding(.horizontal, 52)
             .padding(.top, 25)
-            .frame(width: 270, height: 54)
+            .frame(width: textScale > 1.2 ? 310 : 270,
+                   height: textScale > 1.2 ? 64 : 54)
             
             Spacer()
         }

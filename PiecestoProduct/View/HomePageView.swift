@@ -25,6 +25,10 @@ struct HomePageView: View {
     var topFlowerSpacing: CGFloat = 20
     var bottomFlowerSpacing: CGFloat = 40
     var curvedSectionYOffset: CGFloat = 0
+    var menuButtonXPadding: CGFloat = 20
+    var menuButtonYPosition: CGFloat = 22
+    var colorPadding: CGFloat = 24
+    
     var onWorkoutTap: (EnergyState) -> Void = {_ in}
     var onEnergyChange: (EnergyState) -> Void = { _ in }
     var onBackTap: () -> Void = {}
@@ -42,74 +46,83 @@ struct HomePageView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            contentArea
-            
-            if showSettings {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(
-                            .spring(response: 0.3, dampingFraction: 0.85)
-                        ) {
-                            showSettings = false
-                        }
+        GeometryReader { geometry in
+            ZStack(alignment: .topTrailing) {
+                contentArea
+                
+                Button {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
+                        showSettings = true
                     }
-                    .zIndex(20)
+                } label: {
+                    MenuButton()
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
+                .position(
+                    x: geometry.size.width - menuButtonXPadding - 24,
+                    y: menuButtonYPosition
+                )
+                .zIndex(10)
                 
-                SettingsPopoverView()
-                    .frame(width: 280)
-                    .padding(.trailing, 28)
-                    .padding(.top, settingsPopoverTopPadding)
-                    .transition(
-                        .scale(scale: 0.92, anchor: .topTrailing)
-                        .combined(with: .opacity)
-                    )
-                    .zIndex(30)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            ZStack {
-                Image("OnboardBackground")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                
-                if isDark {
-                    Color(red: 0.10, green: 0.07, blue: 0.09)
+                if showSettings {
+                    Color.black.opacity(0.001)
                         .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(
+                                .spring(response: 0.3, dampingFraction: 0.85)
+                            ) {
+                                showSettings = false
+                            }
+                        }
+                        .zIndex(20)
+                    
+                    SettingsPopoverView()
+                        .frame(width: 280)
+                        .position(
+                            x: geometry.size.width - 28 - 140,
+                            y: settingsPopoverTopPadding + 100
+                        )
+                        .transition(
+                            .scale(scale: 0.92, anchor: .topTrailing)
+                            .combined(with: .opacity)
+                        )
+                        .zIndex(30)
                 }
             }
-        }
-        .onAppear {
-            onEnergyChange(energyState)
-        }
-        .onChange(of: energyState) { oldValue, newValue in
-            onEnergyChange(newValue)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                ZStack {
+                    Image("OnboardBackground")
+                        .resizable()
+                        .scaledToFill()
+                        .ignoresSafeArea()
+                    
+                    if isDark {
+                        Color(red: 0.10, green: 0.07, blue: 0.09)
+                            .ignoresSafeArea()
+                    }
+                }
+            }
+            .onAppear {
+                onEnergyChange(energyState)
+            }
+            .onChange(of: energyState) { oldValue, newValue in
+                onEnergyChange(newValue)
+            }
         }
     }
     
     private var contentArea: some View {
-        ZStack{
+        ZStack {
             VStack(alignment: .center, spacing: -3) {
-                HStack{
-                    Spacer()
-                    Button {
-                        withAnimation(
-                            .spring(response: 0.3, dampingFraction: 0.85)
-                        ) {
-                            showSettings = true
-                        }
-                    } label: {
-                        MenuButton()
-                    }
-                    .buttonStyle(.plain)
-                    .opacity(showSettings ? 0 : 1)
-                    .allowsHitTesting(!showSettings)
-                }
-                .padding(topBarPadding)
-                .padding(.bottom, 10)
+                Color.clear
+                    .frame(height: 48)
+                    .padding(.top, colorPadding)
+                
                 Text("Hi, \(userName.isEmpty ? "Mama" : userName)!")
                     .font(
                         Font
@@ -138,7 +151,6 @@ struct HomePageView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.bottom, 10)
                 
-                
                 Spacer()
                 
                 Image(energyState.imageName)
@@ -148,12 +160,10 @@ struct HomePageView: View {
                     .animation(.spring, value: energyProgress)
                     .offset(x: energyState.imageOffset)
                     .padding(.bottom, 30)
-
+                
                 Spacer()
                 
                 ZStack(alignment: .top) {
-                    
-                    
                     CurvedTopRectangle()
                         .fill(
                             isDark
@@ -176,12 +186,12 @@ struct HomePageView: View {
                         )
                         .ignoresSafeArea(edges: .bottom)
                     
-                    VStack(spacing: 30) {
+                    VStack(spacing: textScale > 1.2 ? 12 : 30) {
                         CurvedSlider(progress: $energyProgress, isDark: isDark)
                             .frame(height: 100)
                             .padding(.top, -20)
                         
-                        VStack(spacing: 12) {
+                        VStack(spacing: textScale > 1.2 ? 4 : 12) {
                             Text(energyState.title)
                                 .font(
                                     .system(size: 18 * textScale, weight: .bold)
@@ -190,22 +200,25 @@ struct HomePageView: View {
                                 .foregroundStyle(.white)
                             
                             Text(energyState.description)
-                                .font(.system(size: 14 * textScale))
-                                .frame(maxWidth: 320)
+                                .font(.system(size: min(14 * textScale, 17)))
+                                .frame(maxWidth: 490)
                                 .lineSpacing(3)
                                 .multilineTextAlignment(.center)
                                 .tracking(0)
                                 .foregroundStyle(.white.opacity(0.9))
-                                .padding(.horizontal, 30)
+                                .padding(.horizontal, textScale > 1.2 ? 10 : 30)
+                                .lineLimit(3)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
+                        .padding(.top, textScale > 1.2 ? 10 : 0)
                         .animation(.easeInOut, value: energyState)
                         
-                        Button{
+                        Button {
                             print(
                                 "HomePageView is passing local state: \(energyState.title)"
                             )
                             onWorkoutTap(energyState)
-                        } label:{
+                        } label: {
                             HStack {
                                 Text("LET'S WORKOUT")
                                     .font(
@@ -216,9 +229,7 @@ struct HomePageView: View {
                                     )
                                 Image(systemName: "chevron.down")
                             }
-                            .foregroundStyle(
-                                Color.white
-                            )
+                            .foregroundStyle(Color.white)
                             .padding(.vertical, 12)
                             .padding(.horizontal, 24)
                             .background(
@@ -236,7 +247,7 @@ struct HomePageView: View {
                         .padding(.bottom, 10)
                     }
                 }
-                .frame(height: 300)
+                .frame(height: textScale > 1.2 ? 340 : 300)
                 .offset(y: curvedSectionYOffset)
             }
         }
@@ -342,7 +353,7 @@ struct CurvedSlider: View {
                     .frame(width: width, height: 70)
                     .offset(y: 45)
                 
-                HStack{
+                HStack {
                     Image(systemName: "chevron.left")
                         .resizable()
                         .scaledToFit()
@@ -350,11 +361,13 @@ struct CurvedSlider: View {
                         .frame(width: 15, height: 15)
                         .shadow(radius: 10)
                         .padding(.horizontal, -10)
+                    
                     Image("WhiteFlower")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 65, height: 65)
                         .shadow(radius: 3)
+                    
                     Image(systemName: "chevron.right")
                         .resizable()
                         .scaledToFit()

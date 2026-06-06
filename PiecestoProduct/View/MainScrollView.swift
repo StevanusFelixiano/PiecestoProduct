@@ -23,6 +23,8 @@ struct MainScrollView: View {
                             topBarPadding: 22,
                             settingsPopoverTopPadding: 60,
                             curvedSectionYOffset: -8,
+                            menuButtonYPosition: 81,
+                            colorPadding: 42,
                             onWorkoutTap: { incomingEnergy in
                                 selectedEnergy = incomingEnergy
                                 workoutPlanRefreshID = UUID()
