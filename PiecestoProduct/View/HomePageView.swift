@@ -376,6 +376,7 @@ struct CurvedSlider: View {
                         .shadow(radius: 10)
                         .padding(.horizontal, -10)
                 }
+                .rotationEffect(calculateRotation(progress: progress, sliderWidth: sliderWidth))
                 .offset(x: (progress * sliderWidth) - 33)
                 .offset(y: 5 + calculateYOffset(progress: progress))
                 .gesture(
@@ -395,6 +396,16 @@ struct CurvedSlider: View {
         let t = progress
         let trueY = 160 * (t * t) - 160 * t + 60
         return trueY - 35
+    }
+    func calculateRotation(progress: CGFloat, sliderWidth: CGFloat) -> Angle {
+        let t = progress
+        
+        // turunan dari curve y = 160t² - 160t + 60
+        let dy = 320 * t - 160
+        let dx = sliderWidth
+        
+        let radians = atan(dy / dx)
+        return .radians(Double(radians))
     }
 }
 
