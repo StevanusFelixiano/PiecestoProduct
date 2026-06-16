@@ -10,9 +10,8 @@ import SwiftUI
 struct PostExerciseView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
-    
     @AppStorage("textScale") private var textScale = 1.0
-    
+    var onBackHome: () -> Void = {}
     @State private var showSettings = false
     
     private var isDark: Bool {
@@ -44,30 +43,9 @@ struct PostExerciseView: View {
                     .zIndex(30)
             }
         }
-        .toolbar{
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(
-                        .spring(response: 0.3, dampingFraction: 0.85)
-                    ) {
-                        showSettings = true
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(
-                            isDark
-                            ? Color.white
-                            : Color.black
-                        )
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .background {
             backgroundView
         }
@@ -75,24 +53,43 @@ struct PostExerciseView: View {
     
     private var mainContent: some View {
         VStack {
+            HStack {
+                Spacer()
+                Button {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+                        showSettings = true
+                    }
+                } label: {
+                    MenuButton()
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
+            }
+            .padding(.horizontal, 20)
+            
             Spacer()
+                .frame(height: 120)
+            
             Image("FullFlower")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 270, height: 270)
                 .opacity(isDark ? 0.85 : 1.0)
+                .padding(.bottom, -10)
             
-            VStack(spacing: 8) {
-                Text("You did it! Thank you for prioritizing yourself today.")
-                    .font(.system(size: 17 * textScale, weight: .regular))
+            VStack(spacing: 0) {
+                Text("Congrats! You already finished today’s exercise.")
+                    .font(.system(size: 16 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.88)
                         : Color(red: 0.36, green: 0.24, blue: 0.25)
                     )
                     .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
                 
-                Text("We hope you're feeling a bit more like yourself after taking this time for yourself")
+                Text("We hope you're feeling better after taking this time for yourself")
                     .font(.system(size: 17 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
@@ -101,9 +98,11 @@ struct PostExerciseView: View {
                     )
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 42)
+            .padding(.horizontal, 22)
             
-            NavigationLink(value: AppRoute.home){
+            Button {
+                onBackHome()
+            } label: {
                 Text("Back to Home")
                     .font(.system(size: 17 * textScale, weight: .semibold))
                     .foregroundStyle(.white)
@@ -123,9 +122,11 @@ struct PostExerciseView: View {
                         y: 5
                     )
             }
-            
+            .buttonStyle(.plain)
             .padding(.horizontal, 52)
-            .padding(.top, 40)
+            .padding(.top, 25)
+            .frame(width: textScale > 1.2 ? 310 : 270,
+                   height: textScale > 1.2 ? 64 : 54)
             
             Spacer()
         }

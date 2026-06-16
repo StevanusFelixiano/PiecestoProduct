@@ -8,55 +8,110 @@
 import SwiftUI
 
 struct MainScrollView: View {
-    @State private var isScrollDisabled = true
-    
+    @State private var path = NavigationPath()
     @State private var selectedEnergy: EnergyState = .findingRhythm
+    @State private var workoutPlanRefreshID = UUID()
+    @State private var currentSection: String?
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollViewReader { proxy in
                 ScrollView(.vertical, showsIndicators: false) {
                     VStack(spacing: 0) {
-                        
-                        HomePageView(onWorkoutTap: {_ in 
-                            isScrollDisabled = false
-                            withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
-                                proxy.scrollTo("workout_plan_section", anchor: .top)
+                        HomePageView(
+                            topPadding: 44,
+                            topBarPadding: 22,
+                            settingsPopoverTopPadding: 60,
+                            curvedSectionYOffset: -8,
+                            menuButtonYPosition: 81,
+                            colorPadding: 42,
+                            onWorkoutTap: { incomingEnergy in
+                                selectedEnergy = incomingEnergy
+                                workoutPlanRefreshID = UUID()
+                                
+                                withAnimation(
+                                    .spring(
+                                        response: 0.6,
+                                        dampingFraction: 0.85
+                                    )
+                                ) {
+                                    proxy.scrollTo(
+                                        "workout_plan_section",
+                                        anchor: .top
+                                    )
+                                }
+                            },
+                            onEnergyChange: { newEnergy in
+                                selectedEnergy = newEnergy
                             }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                isScrollDisabled = true
-                            }
-                        })
+                        )
                         .id("homepage_section")
                         .containerRelativeFrame(.vertical, alignment: .center)
                         
-                        WorkoutPlanView(onBackTap: {
-                            withAnimation(.spring(response: 0.6, dampingFraction: 0.85)) {
-                                proxy.scrollTo("homepage_section", anchor: .top)
-                            }
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                isScrollDisabled = false
-                            }
-                        }, energyState: selectedEnergy)
+                        ZStack {
+                            WorkoutPlanView(
+                                onBackTap: {
+                                    withAnimation(
+                                        .spring(
+                                            response: 0.6,
+                                            dampingFraction: 0.85
+                                        )
+                                    ) {
+                                        proxy.scrollTo(
+                                            "homepage_section",
+                                            anchor: .top
+                                        )
+                                    }
+                                },
+                                energyState: $selectedEnergy
+                            )
+                            .id(workoutPlanRefreshID)
+                        }
                         .id("workout_plan_section")
                         .containerRelativeFrame(.vertical, alignment: .center)
                     }
+                    .scrollTargetLayout()
                 }
-                .scrollDisabled(isScrollDisabled)
+                .contentMargins(0, for: .scrollContent)
+                .scrollTargetBehavior(.paging)
+                .scrollPosition(id: $currentSection)
+                .onChange(of: currentSection) { oldValue, newValue in
+                    if newValue == "workout_plan_section",
+                       oldValue != "workout_plan_section" {
+                        workoutPlanRefreshID = UUID()
+                    }
+                }
                 .ignoresSafeArea()
-            }
-            .navigationDestination(for: AppRoute.self) { route in
-                switch route {
-                case .home:
-                    HomePageView()
-                case .plan (let exactEnergyState):
-                    WorkoutPlanView(energyState: exactEnergyState)
-                case .video:
-                    WorkoutVideoView()
-                case .breathing:
-                    BreathingExerciseView()
-                case .finish:
-                    PostExerciseView()
+                .navigationDestination(for: AppRoute.self) { route in
+                    switch route {
+                    case .video(let selectedVideo):
+                        WorkoutVideoView(video: selectedVideo)
+                        
+                    case .breathing:
+                        BreathingExerciseView {
+                                path.append(AppRoute.finish)
+                            }
+                        
+                    case .finish:
+                        PostExerciseView {
+                            var transaction = Transaction()
+                            transaction.animation = nil
+                            
+                            withTransaction(transaction) {
+                                proxy.scrollTo(
+                                    "homepage_section",
+                                    anchor: .top
+                                )
+                            }
+                            
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                                path.removeLast(path.count)
+                            }
+                        }
+                        
+                    default:
+                        EmptyView()
+                    }
                 }
             }
         }
@@ -64,7 +119,7 @@ struct MainScrollView: View {
 }
 
 #Preview {
-    AppThemeManager{
+    AppThemeManager {
         MainScrollView()
     }
 }

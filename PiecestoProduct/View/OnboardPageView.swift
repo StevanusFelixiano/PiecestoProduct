@@ -99,6 +99,7 @@ struct OnboardPageView: View {
             AnimatedHelloIllustration()
                 .scaleEffect(1.2)
                 .frame(width: 260, height: 230)
+                .padding(.vertical, 12)
             
             VStack(spacing: 10) {
                 Text("Your wellbeing starts here")
@@ -106,7 +107,7 @@ struct OnboardPageView: View {
                     .foregroundStyle(
                         isDark
                         ? Color(red: 1.00, green: 0.84, blue: 0.86)
-                        : Color(red: 0.36, green: 0.24, blue: 0.25)
+                        : Color(red: 0.36, green: 0.27, blue: 0.16)
                     )
                     .multilineTextAlignment(.center)
                 
@@ -128,7 +129,7 @@ struct OnboardPageView: View {
                     Text("Get Started")
                         .font(.system(size: 17 * textScale, weight: .semibold))
                         .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
+                        .frame(width: 120)
                         .padding()
                         .background(
                             isDark

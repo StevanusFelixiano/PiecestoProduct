@@ -17,7 +17,7 @@ struct RootView: View {
         } else if !hasCompletedInitialSetup {
             AddNameView()
         } else {
-            HomePageView()
+            MainScrollView()
         }
     }
 }

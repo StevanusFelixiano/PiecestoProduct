@@ -12,16 +12,32 @@ struct BreathingExerciseView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
+    var onFinish: () -> Void = {}
+    
     @State private var isBreathing = false
     @State private var isRunning = false
+    @State private var isFinished = false
     @State private var showSettings = false
     @State private var remainingSeconds = 180
     @State private var timer: Timer?
     @State private var breathingTimer: Timer?
-    @State private var audioPlayer: AVAudioPlayer?
+    
+    @State private var audioPlayerA: AVAudioPlayer?
+    @State private var audioPlayerB: AVAudioPlayer?
+    @State private var usePlayerA = true
+    
+    @AppStorage("textScale") private var textScale = 1.0
     
     private var isDark: Bool {
         colorScheme == .dark
+    }
+    
+    private var peach: Color {
+        Color(red: 250/255, green: 154/255, blue: 138/255)
+    }
+    
+    private var darkPeach: Color {
+        Color(red: 0.82, green: 0.43, blue: 0.52)
     }
     
     private var formattedTime: String {
@@ -38,9 +54,7 @@ struct BreathingExerciseView: View {
                 Color.black.opacity(0.001)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        withAnimation(
-                            .spring(response: 0.3, dampingFraction: 0.85)
-                        ) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
                             showSettings = false
                         }
                     }
@@ -57,30 +71,9 @@ struct BreathingExerciseView: View {
                     .zIndex(30)
             }
         }
-        .toolbar{
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    withAnimation(
-                        .spring(response: 0.3, dampingFraction: 0.85)
-                    ) {
-                        showSettings = true
-                    }
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(
-                            isDark
-                            ? Color.white
-                            : Color.black
-                        )
-                        .clipShape(Circle())
-                }
-                .buttonStyle(.plain)
-                .opacity(showSettings ? 0 : 1)
-                .allowsHitTesting(!showSettings)
-            }
-        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .onDisappear {
             timer?.invalidate()
             timer = nil
@@ -89,83 +82,91 @@ struct BreathingExerciseView: View {
         }
     }
     
-    private func playBreathSound(isIn: Bool) {
-        let soundName = isIn ? "breath-in" : "breath-out"
-        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else { return }
-        
-        audioPlayer?.stop()
-        audioPlayer = try? AVAudioPlayer(contentsOf: url)
-        audioPlayer?.play()
-    }
-    
     private var breathingLabel: String {
         guard isRunning else { return "One breath at a time..." }
-        return isBreathing ? "Breathe In..." : "Breathe Out..."
+        return isBreathing ? "Breathe In" : "Breathe Out"
     }
     
     private var mainContent: some View {
-        
         ZStack {
             backgroundLayer
             
             VStack {
+                topBar
                 
-                Text("A MOMENT TO BREATHE")
-                    .font(.system(size: 26, weight: .bold))
+                Text("COOLDOWN")
+                    .font(.system(size: 26 * textScale, weight: .bold))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.92)
                         : Color(red: 0.32, green: 0.25, blue: 0.20)
                     )
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 28)
+                
                     .padding(.top, 16)
                 
                 Spacer()
                 
-                breathingCircle
                 
-                Button {
-                    toggleTimer()
-                } label: {
-                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                        .font(.system(size: 48, weight: .bold))
+                ZStack {
+                    breathingCircle
+                    Button {
+                        toggleTimer()
+                    } label: {
+                        Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                            .font(.system(size: 48, weight: .bold))
+                            .foregroundStyle(
+                                isDark
+                                ? Color(red: 0.82, green: 0.43, blue: 0.52)
+                                : Color(red: 0.32, green: 0.25, blue: 0.20))
+                            .frame(width: 90, height: 90)
+                            .background(
+                                isDark
+                                ? Color.white.opacity(0.90)
+                                : Color.white.opacity(0.78)
+                            )
+                            .clipShape(Circle())
+                            .shadow(
+                                color: isDark
+                                ? Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.28)
+                                : .black.opacity(0.08),
+                                radius: 12,
+                                y: 6
+                            )
+                    }
+                    
+                }
+                
+                Spacer()
+                
+                ZStack {
+                    Text(formattedTime)
+                        .id(remainingSeconds)
+                        .font(.system(size: 40 * textScale, weight: .semibold, design: .rounded))
                         .foregroundStyle(
                             isDark
-                            ? Color(red: 0.92, green: 0.42, blue: 0.56)
-                            : Color(red: 0.36, green: 0.28, blue: 0.20)
+                            ? Color.white.opacity(0.92)
+                            : Color(red: 0.32, green: 0.25, blue: 0.20)
                         )
-                        .frame(width: 108, height: 108)
-                        .background(
-                            isDark
-                            ? Color.white.opacity(0.90)
-                            : Color.white.opacity(0.78)
-                        )
-                        .clipShape(Circle())
-                        .shadow(
-                            color: isDark
-                            ? Color(red: 0.92, green: 0.42, blue: 0.56)
-                                .opacity(0.28)
-                            : .black.opacity(0.08),
-                            radius: 12,
-                            y: 6
-                        )
+                        .transition(.opacity)
                 }
-                .padding(.top, 36)
+                .animation(.easeInOut(duration: 0.35), value: remainingSeconds)
+                
                 
                 Text(breathingLabel)
-                    .font(.system(size: 26, weight: .regular))
+                    .font(.system(size: 24 * textScale, weight: .regular))
                     .foregroundStyle(
                         isDark
                         ? Color.white.opacity(0.78)
                         : Color(red: 0.32, green: 0.25, blue: 0.20)
                     )
-                    .animation(.easeInOut(duration: 0.4), value: breathingLabel)
+                    .animation(.easeInOut(duration: 0.8), value: breathingLabel)
                     .padding(.top, 22)
                 
-                NavigationLink(value: AppRoute.finish){
+                Button {
+                    finishExercise()
+                } label: {
                     Text("FINISH")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 17 * textScale, weight: .bold))
                         .foregroundStyle(.white)
                         .frame(width: 150, height: 52)
                         .background(
@@ -176,20 +177,13 @@ struct BreathingExerciseView: View {
                         .clipShape(Capsule())
                         .shadow(
                             color: isDark
-                            ? Color(red: 0.82, green: 0.43, blue: 0.52)
-                                .opacity(0.30)
-                            : Color(red: 250/255, green: 154/255, blue: 138/255)
-                                .opacity(0.30),
+                            ? Color(red: 0.82, green: 0.43, blue: 0.52).opacity(0.30)
+                            : Color(red: 250/255, green: 154/255, blue: 138/255).opacity(0.30),
                             radius: 10,
                             y: 5
                         )
                 }
-                .simultaneousGesture(TapGesture().onEnded{
-                    timer?.invalidate()
-                    timer = nil
-                    isRunning = false
-                    isBreathing = false
-                })
+                .buttonStyle(.plain)
                 .padding(.top, 52)
                 
                 Spacer()
@@ -214,10 +208,7 @@ struct BreathingExerciseView: View {
                     )
                     
                     Circle()
-                        .fill(
-                            Color(red: 0.85, green: 0.35, blue: 0.52)
-                                .opacity(0.16)
-                        )
+                        .fill(Color(red: 0.85, green: 0.35, blue: 0.52).opacity(0.16))
                         .frame(width: 320, height: 320)
                         .blur(radius: 60)
                         .position(
@@ -226,10 +217,7 @@ struct BreathingExerciseView: View {
                         )
                     
                     Circle()
-                        .fill(
-                            Color(red: 0.45, green: 0.72, blue: 0.88)
-                                .opacity(0.12)
-                        )
+                        .fill(Color(red: 0.45, green: 0.72, blue: 0.88).opacity(0.12))
                         .frame(width: 280, height: 280)
                         .blur(radius: 55)
                         .position(
@@ -240,10 +228,7 @@ struct BreathingExerciseView: View {
                     Image("BreathingBackground")
                         .resizable()
                         .scaledToFill()
-                        .frame(
-                            width: geometry.size.width,
-                            height: geometry.size.height
-                        )
+                        .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipped()
                 }
             }
@@ -261,13 +246,20 @@ struct BreathingExerciseView: View {
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(.white)
                     .frame(width: 48, height: 48)
-                    .background(Color(red: 0.63, green: 0.58, blue: 0.73))
+                    .background(
+                        isDark
+                        ? Color.white.opacity(0.20)
+                        : Color(red: 0.980, green: 0.604, blue: 0.541)
+                    )
                     .clipShape(Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(.white.opacity(0.35), lineWidth: 1)
+                    }
                     .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
             }
             .buttonStyle(.plain)
-            .padding(.horizontal, 28)
-            
+            .padding(.horizontal, 16)
             
             Spacer()
             
@@ -286,7 +278,7 @@ struct BreathingExerciseView: View {
         .padding(.top, 10)
     }
     
-    struct Droplet: Shape {
+    struct Petals: Shape {
         func path(in rect: CGRect) -> Path {
             var path = Path()
             
@@ -323,31 +315,27 @@ struct BreathingExerciseView: View {
                 )
                 .frame(width: 210, height: 210)
                 .blur(radius: 10)
-                .scaleEffect(isBreathing ? 0.5 : 1.5)
+                .scaleEffect(isBreathing ? 2 : 0.5)
                 .opacity(isRunning ? 0.3 : 0.5)
                 .animation(
                     isRunning
-                    ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
+                    ? .easeInOut(duration: 4).repeatForever(autoreverses: true)
                     : .easeInOut(duration: 0.3),
                     value: isBreathing
                 )
             
             ForEach(0..<24, id: \.self) { index in
-                Droplet()
+                Petals()
                     .fill(
                         LinearGradient(
                             colors: isDark
                             ? [
-                                Color(red: 0.92, green: 0.42, blue: 0.56)
-                                    .opacity(0.85),
-                                Color(red: 0.55, green: 0.80, blue: 0.88)
-                                    .opacity(0.70)
+                                Color(red: 0.92, green: 0.42, blue: 0.56).opacity(0.85),
+                                Color(red: 0.55, green: 0.80, blue: 0.88).opacity(0.70)
                             ]
                             : [
-                                Color(red: 0.42, green: 0.82, blue: 0.90)
-                                    .opacity(0.75),
-                                Color(red: 0.88, green: 0.92, blue: 0.68)
-                                    .opacity(0.55)
+                                Color(red: 0.42, green: 0.82, blue: 0.90).opacity(0.75),
+                                Color(red: 0.88, green: 0.92, blue: 0.68).opacity(0.55)
                             ],
                             startPoint: .top,
                             endPoint: .bottom
@@ -357,11 +345,11 @@ struct BreathingExerciseView: View {
                     .offset(y: -120)
                     .rotationEffect(.degrees(Double(index) * 360 / 24))
             }
-            .scaleEffect(isBreathing ? 0.3 : 0.8)
-            .opacity(isRunning ? 0.8 : 1)
+            .scaleEffect(isBreathing ? 1 : 0.3)
+            .opacity(isRunning ? 1 : 0.8)
             .animation(
                 isRunning
-                ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
+                ? .easeInOut(duration: 4).repeatForever(autoreverses: true)
                 : .easeInOut(duration: 0.3),
                 value: isBreathing
             )
@@ -374,23 +362,14 @@ struct BreathingExerciseView: View {
                 )
                 .frame(width: 100, height: 210)
                 .blur(radius: 10)
-                .scaleEffect(isBreathing ? 0.5 : 1.5)
+                .scaleEffect(isBreathing ? 1.5 : 0.5)
                 .opacity(isRunning ? 0.3 : 1)
                 .animation(
                     isRunning
-                    ? .easeInOut(duration: 2.8).repeatForever(autoreverses: true)
+                    ? .easeInOut(duration: 4).repeatForever(autoreverses: true)
                     : .easeInOut(duration: 0.3),
                     value: isBreathing
                 )
-            
-            Text(formattedTime)
-                .font(.system(size: 46, weight: .semibold, design: .rounded))
-                .foregroundStyle(
-                    isDark
-                    ? Color.white.opacity(0.92)
-                    : Color(red: 0.32, green: 0.25, blue: 0.20)
-                )
-            
         }
         .frame(width: 270, height: 270)
     }
@@ -403,36 +382,110 @@ struct BreathingExerciseView: View {
         }
     }
     
+    private func finishExercise() {
+        timer?.invalidate()
+        timer = nil
+        breathingTimer?.invalidate()
+        breathingTimer = nil
+        
+        isRunning = false
+        isBreathing = false
+        isFinished = true
+        
+        onFinish()
+    }
+    
+    private func setupAudioSession() {
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            print("Audio session error: \(error)")
+        }
+    }
+
+    private func playBreathSound(isIn: Bool) {
+        let soundName = isIn ? "breath-in" : "breath-out"
+        guard let url = Bundle.main.url(forResource: soundName, withExtension: "mp3") else {
+            print("Sound file not found: \(soundName).mp3")
+            return
+        }
+        
+        do {
+            let incomingPlayer = try AVAudioPlayer(contentsOf: url)
+            incomingPlayer.volume = 0
+            incomingPlayer.prepareToPlay()
+            incomingPlayer.play()
+            
+            if usePlayerA {
+                audioPlayerA = incomingPlayer
+            } else {
+                audioPlayerB = incomingPlayer
+            }
+            
+            let outgoing = usePlayerA ? audioPlayerB : audioPlayerA
+            let incoming = incomingPlayer
+            usePlayerA.toggle()
+            
+            var step = 0
+            let steps = 30
+            let interval = 1.5 / Double(steps)
+            
+            Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { t in
+                step += 1
+                let progress = Float(step) / Float(steps)
+                incoming.volume = progress
+                outgoing?.volume = 1.0 - progress
+                
+                if step >= steps {
+                    outgoing?.stop()
+                    incoming.volume = 1.0
+                    t.invalidate()
+                }
+            }
+        } catch {
+            print("Audio player error: \(error)")
+        }
+    }
+    
     private func startTimer() {
+        setupAudioSession()
+        isFinished = false
+        
         isRunning = true
         isBreathing = true
         playBreathSound(isIn: true)
         
         timer?.invalidate()
         
-        timer = Timer
-            .scheduledTimer(
-                withTimeInterval: 1,
-                repeats: true
-            ) { currentTimer in
-                if remainingSeconds > 0 {
-                    remainingSeconds -= 1
-                } else {
-                    currentTimer.invalidate()
-                    timer = nil
-                    isRunning = false
-                    isBreathing = false
-                }
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { currentTimer in
+            if remainingSeconds > 0 {
+                remainingSeconds -= 1
+            } else {
+                currentTimer.invalidate()
+                finishExercise()
             }
+        }
+        
+        breathingTimer?.invalidate()
+        breathingTimer = Timer.scheduledTimer(withTimeInterval: 4, repeats: true) { _ in
+            withAnimation(.easeInOut(duration: 2.8)) {
+                isBreathing.toggle()
+            }
+            playBreathSound(isIn: isBreathing)
+        }
     }
     
     private func pauseTimer() {
         isRunning = false
-        isBreathing = false
-        timer?.invalidate()
-        timer = nil
         breathingTimer?.invalidate()
         breathingTimer = nil
+        timer?.invalidate()
+        timer = nil
+        
+        withAnimation(.easeInOut(duration: 0.6)) {
+            isBreathing = false
+        }
     }
 }
 
@@ -453,6 +506,27 @@ struct CircleIconButton: View {
 
 #Preview {
     AppThemeManager {
-        BreathingExerciseView()
+        BreathingPreviewWrapper()
+    }
+}
+
+private struct BreathingPreviewWrapper: View {
+    @State private var path = NavigationPath()
+    
+    var body: some View {
+        NavigationStack(path: $path) {
+            BreathingExerciseView {
+                path.append(AppRoute.finish)
+            }
+            .navigationDestination(for: AppRoute.self) { route in
+                switch route {
+                case .finish:
+                    PostExerciseView()
+                    
+                default:
+                    EmptyView()
+                }
+            }
+        }
     }
 }

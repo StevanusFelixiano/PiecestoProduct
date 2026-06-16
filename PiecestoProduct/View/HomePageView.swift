@@ -14,17 +14,24 @@ struct HomePageView: View {
         "hasCompletedInitialSetup"
     ) private var hasCompletedInitialSetup = false
     @AppStorage("textScale") private var textScale = 1.0
+    @AppStorage("userName") private var userName = ""
     
     @State private var showSettings = false
     
     @State private var energyProgress: CGFloat = 0.5
-    
-    @State private var showWorkoutPlan = false
+    var topPadding: CGFloat = 0
+    var topBarPadding: CGFloat = 20
+    var settingsPopoverTopPadding: CGFloat = 20
+    var topFlowerSpacing: CGFloat = 20
+    var bottomFlowerSpacing: CGFloat = 40
+    var curvedSectionYOffset: CGFloat = 0
+    var menuButtonXPadding: CGFloat = 20
+    var menuButtonYPosition: CGFloat = 22
+    var colorPadding: CGFloat = 24
     
     var onWorkoutTap: (EnergyState) -> Void = {_ in}
+    var onEnergyChange: (EnergyState) -> Void = { _ in }
     var onBackTap: () -> Void = {}
-    
-    //    @Binding var
     
     private var isDark: Bool {
         colorScheme == .dark
@@ -39,87 +46,84 @@ struct HomePageView: View {
     }
     
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            
-            contentArea
-            
-            if showSettings {
-                Color.black.opacity(0.001)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(
-                            .spring(response: 0.3, dampingFraction: 0.85)
-                        ) {
-                            showSettings = false
-                        }
+        GeometryReader { geometry in
+            ZStack(alignment: .topTrailing) {
+                contentArea
+                
+                Button {
+                    withAnimation(
+                        .spring(response: 0.3, dampingFraction: 0.85)
+                    ) {
+                        showSettings = true
                     }
-                    .zIndex(20)
+                } label: {
+                    MenuButton()
+                }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
+                .position(
+                    x: geometry.size.width - menuButtonXPadding - 24,
+                    y: menuButtonYPosition
+                )
+                .zIndex(10)
                 
-                SettingsPopoverView()
-                    .frame(width: 280)
-                    .padding(.trailing, 28)
-                    .padding(.top, 20)
-                    .transition(
-                        .scale(scale: 0.92, anchor: .topTrailing)
-                        .combined(with: .opacity)
-                    )
-                    .zIndex(30)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background {
-            ZStack {
-                Image("OnboardBackground")
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-                
-                if isDark {
-                    Color(red: 0.10, green: 0.07, blue: 0.09)
+                if showSettings {
+                    Color.black.opacity(0.001)
                         .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation(
+                                .spring(response: 0.3, dampingFraction: 0.85)
+                            ) {
+                                showSettings = false
+                            }
+                        }
+                        .zIndex(20)
+                    
+                    SettingsPopoverView()
+                        .frame(width: 280)
+                        .position(
+                            x: geometry.size.width - 28 - 140,
+                            y: settingsPopoverTopPadding + 100
+                        )
+                        .transition(
+                            .scale(scale: 0.92, anchor: .topTrailing)
+                            .combined(with: .opacity)
+                        )
+                        .zIndex(30)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background {
+                ZStack {
+                    Image("OnboardBackground")
+                        .resizable()
+                        .scaledToFill()
+                        .ignoresSafeArea()
+                    
+                    if isDark {
+                        Color(red: 0.10, green: 0.07, blue: 0.09)
+                            .ignoresSafeArea()
+                    }
+                }
+            }
+            .onAppear {
+                onEnergyChange(energyState)
+            }
+            .onChange(of: energyState) { oldValue, newValue in
+                onEnergyChange(newValue)
+            }
         }
-        .toolbar(.hidden, for: .navigationBar)
     }
     
     private var contentArea: some View {
-        ZStack{
+        ZStack {
             VStack(alignment: .center, spacing: -3) {
-                HStack{
-                    Text("YOUR ENERGY TODAY")
-                        .font(.system(size: 20 * textScale, weight: .bold))
-                        .foregroundStyle(
-                            isDark
-                            ? Color(red: 1.00, green: 0.84, blue: 0.86)
-                            : Color(hex: "5B4428")
-                        )
-                        
-                    Spacer()
-                    Button {
-                        withAnimation(
-                            .spring(response: 0.3, dampingFraction: 0.85)
-                        ) {
-                            showSettings = true
-                        }
-                    } label: {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 22, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .background(Color(red: 0.63, green: 0.58, blue: 0.73))
-                            .clipShape(Circle())
-                            .shadow(color: .black.opacity(0.12), radius: 6, y: 3)
-                    }
-                    .buttonStyle(.plain)
-                    .opacity(showSettings ? 0 : 1)
-                    .allowsHitTesting(!showSettings)
-                }
-                .padding(.horizontal, 24)
-                .padding(.top, 10)
-                .padding(.bottom, 20)
-                    
-                Text("Hi, Sora!")
+                Color.clear
+                    .frame(height: 48)
+                    .padding(.top, colorPadding)
+                
+                Text("Hi, \(userName.isEmpty ? "Mama" : userName)!")
                     .font(
                         Font
                             .system(
@@ -134,96 +138,117 @@ struct HomePageView: View {
                         : Color(hex: "5B4428")
                     )
                     .padding(.bottom, 10)
-                    
-                Text(
-                    "Let us do the gentle check,\n how is your energy level?"
-                )
-                .font(.system(size: 17 * textScale))
-                .foregroundStyle(
-                    isDark
-                    ? Color(red: 0.86, green: 0.72, blue: 0.74)
-                    : Color(hex: "5B4428")
-                )
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-                .padding (.bottom, 10)
-                .fixedSize(horizontal: false, vertical: true)
-                    
+                
+                Text("Let's do a quick check-in.\n How is your energy right now?")
+                    .font(.system(size: 17 * textScale))
+                    .foregroundStyle(
+                        isDark
+                        ? Color(red: 0.86, green: 0.72, blue: 0.74)
+                        : Color(hex: "5B4428")
+                    )
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 10)
+                
                 Spacer()
-                    
+                
                 Image(energyState.imageName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 300, height: 300)
-                    .animation(.smooth, value: energyProgress)
+                    .animation(.spring, value: energyProgress)
                     .offset(x: energyState.imageOffset)
-                    
-                Spacer()
                     .padding(.bottom, 30)
-                    
+                
+                Spacer()
+                
                 ZStack(alignment: .top) {
                     CurvedTopRectangle()
                         .fill(
-                            isDark ? Color(hex: "FF8A7A") : Color(
-                                hex: "#FA9A8A"
+                            isDark
+                            ? LinearGradient(
+                                colors: [
+                                    Color(red: 0.34, green: 0.18, blue: 0.24),
+                                    Color(red: 0.24, green: 0.13, blue: 0.18)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            : LinearGradient(
+                                colors: [
+                                    Color(hex: "FA9A8A"),
+                                    Color(hex: "FA9A8A")
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
                             )
                         )
                         .ignoresSafeArea(edges: .bottom)
-                        .ignoresSafeArea(edges: .bottom)
-                        
-                        
-                    VStack(spacing: 30) {
-                        CurvedSlider(progress: $energyProgress)
+                    
+                    VStack(spacing: textScale > 1.2 ? 12 : 30) {
+                        CurvedSlider(progress: $energyProgress, isDark: isDark)
                             .frame(height: 100)
                             .padding(.top, -20)
-                            
-                        VStack(spacing: 12) {
+                        
+                        VStack(spacing: textScale > 1.2 ? 4 : 12) {
                             Text(energyState.title)
                                 .font(
-                                    .system(
-                                        size: 18 * textScale,
-                                        weight: .bold
-                                    )
+                                    .system(size: 18 * textScale, weight: .bold)
                                 )
                                 .tracking(1.5)
                                 .foregroundStyle(.white)
-                                
+                            
                             Text(energyState.description)
-                                .font(.system(size: 14 * textScale))
-                                .frame(maxWidth: energyState.descriptionWidth)
+                                .font(.system(size: min(14 * textScale, 17)))
+                                .frame(maxWidth: 490)
                                 .lineSpacing(3)
                                 .multilineTextAlignment(.center)
                                 .tracking(0)
                                 .foregroundStyle(.white.opacity(0.9))
-                                .padding(.horizontal, 30)
+                                .padding(.horizontal, textScale > 1.2 ? 10 : 30)
+                                .lineLimit(3)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
+                        .padding(.top, textScale > 1.2 ? 10 : 0)
                         .animation(.easeInOut, value: energyState)
                         
-                        Button{
+                        Button {
+                            print(
+                                "HomePageView is passing local state: \(energyState.title)"
+                            )
                             onWorkoutTap(energyState)
-                        } label:{
+                        } label: {
                             HStack {
-                                    Text("WORKOUT")
-                                        .font(
-                                            .system(
-                                                size: 14 * textScale,
-                                                weight: .bold
-                                            )
+                                Text("LET'S WORKOUT")
+                                    .font(
+                                        .system(
+                                            size: 14 * textScale,
+                                            weight: .bold
                                         )
-                                    Image(systemName: "chevron.down")
-                                }
-                                .foregroundStyle(
-                                    Color(red: 0.29, green: 0.24, blue: 0.20)
-                                )
-                                .padding(.vertical, 12)
-                                .padding(.horizontal, 24)
-                                .background(Color.white)
-                                .clipShape(Capsule())
+                                    )
+                                Image(systemName: "chevron.down")
+                            }
+                            .foregroundStyle(Color.white)
+                            .padding(.vertical, 12)
+                            .padding(.horizontal, 24)
+                            .background(
+                                isDark
+                                ? Color(red: 0.82, green: 0.43, blue: 0.52)
+                                : Color(hex: "FA9A8A")
+                            )
+                            .clipShape(Capsule())
+                            .overlay {
+                                Capsule()
+                                    .stroke(Color.white, lineWidth: 2)
+                            }
+                            .shadow(radius: 8)
                         }
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 10)
                     }
                 }
-                .frame(height: 300)
+                .frame(height: textScale > 1.2 ? 340 : 300)
+                .offset(y: curvedSectionYOffset)
             }
         }
         .background {
@@ -235,7 +260,7 @@ struct HomePageView: View {
                     )
             }
         }
-        .padding(.top, 60)
+        .padding(.top, topPadding)
     }
     
     // MARK: - Safe Area Preference Tracker Hook
@@ -247,10 +272,45 @@ struct HomePageView: View {
     }
 }
 
-// MARK: - Supporting Types & Components
-
 struct CurvedSlider: View {
     @Binding var progress: CGFloat
+    let isDark: Bool
+    
+    private var baseTrackColor: Color {
+        isDark
+        ? Color(red: 0.34, green: 0.18, blue: 0.24)
+        : Color(hex: "FA9A8A")
+    }
+    
+    private var bottomLineColor: Color {
+        isDark
+        ? Color.white.opacity(0.28)
+        : Color(hex: "F8F0E4")
+    }
+    
+    private var topLineColor: Color {
+        isDark
+        ? Color(red: 0.48, green: 0.27, blue: 0.34)
+        : Color(hex: "FA9A8A")
+    }
+    
+    private var sliderGradient: LinearGradient {
+        LinearGradient(
+            colors: isDark
+            ? [
+                Color(red: 0.62, green: 0.27, blue: 0.35),
+                Color(red: 0.74, green: 0.48, blue: 0.30),
+                Color(red: 0.42, green: 0.62, blue: 0.48)
+            ]
+            : [
+                Color(hex: "D4857A"),
+                Color(hex: "F1DF89"),
+                Color(hex: "9EE2A0")
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
     
     var body: some View {
         GeometryReader { geometry in
@@ -259,21 +319,11 @@ struct CurvedSlider: View {
             
             ZStack(alignment: .leading) {
                 CurvedTrackPath()
-                    .stroke(Color(hex: "FA9A8A")
-                    )
+                    .stroke(baseTrackColor)
                 
                 CurvedTrackPath()
                     .stroke(
-                        LinearGradient(
-                            colors: [
-                                Color(hex: "C45E5E"),
-                                Color(hex: "F2EA76"),
-                                Color(hex: "80DF91")
-                            ],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        ),
-
+                        sliderGradient,
                         style: StrokeStyle(lineWidth: 90, lineCap: .square)
                     )
                     .frame(width: sliderWidth, height: 60)
@@ -281,7 +331,7 @@ struct CurvedSlider: View {
                 
                 CurvedTrackPath()
                     .stroke(
-                        Color.white.opacity(0.6),
+                        Color.white.opacity(isDark ? 0.28 : 0.6),
                         style: StrokeStyle(lineWidth: 2, lineCap: .round)
                     )
                     .frame(width: sliderWidth, height: 60)
@@ -289,46 +339,73 @@ struct CurvedSlider: View {
                 
                 CurvedTrackPath()
                     .stroke(
-                        Color(hex: "FA9A8A"),
+                        topLineColor,
                         style: StrokeStyle(lineWidth: 6, lineCap: .round)
                     )
                     .frame(width: width, height: 60)
                     .offset(y: -45)
-                    
+                
                 CurvedTrackPath()
                     .stroke(
-                        Color(hex: "F8F0E4"),
+                        bottomLineColor,
                         style: StrokeStyle(lineWidth: 6, lineCap: .round)
                     )
                     .frame(width: width, height: 70)
                     .offset(y: 45)
                 
-                Image("WhiteFlower")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 65, height: 65)
-                    .shadow(radius: 3)
-                    .offset(x: (progress * sliderWidth) - 23)
-                    .offset(y: 5 + calculateYOffset(progress: progress))
-                    .gesture(
-                        DragGesture()
-                            .onChanged { value in
-                                let newProgress = (
-                                    value.location.x - 10
-                                ) / sliderWidth
-                                progress = min(max(newProgress, 0.05), 0.95)
-                            }
-                    )
+                HStack {
+                    Image(systemName: "chevron.left")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color.white)
+                        .frame(width: 15, height: 15)
+                        .shadow(radius: 10)
+                        .padding(.horizontal, -10)
+                    
+                    Image("WhiteFlower")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 65, height: 65)
+                        .shadow(radius: 3)
+                    
+                    Image(systemName: "chevron.right")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(Color.white)
+                        .frame(width: 15, height: 15)
+                        .shadow(radius: 10)
+                        .padding(.horizontal, -10)
+                }
+                .rotationEffect(calculateRotation(progress: progress, sliderWidth: sliderWidth))
+                .offset(x: (progress * sliderWidth) - 33)
+                .offset(y: 5 + calculateYOffset(progress: progress))
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            let newProgress = (
+                                value.location.x - 10
+                            ) / sliderWidth
+                            progress = min(max(newProgress, 0.05), 0.95)
+                        }
+                )
             }
         }
     }
     
     func calculateYOffset(progress: CGFloat) -> CGFloat {
         let t = progress
-        
         let trueY = 160 * (t * t) - 160 * t + 60
-        
         return trueY - 35
+    }
+    func calculateRotation(progress: CGFloat, sliderWidth: CGFloat) -> Angle {
+        let t = progress
+        
+        // turunan dari curve y = 160t² - 160t + 60
+        let dy = 320 * t - 160
+        let dx = sliderWidth
+        
+        let radians = atan(dy / dx)
+        return .radians(Double(radians))
     }
 }
 

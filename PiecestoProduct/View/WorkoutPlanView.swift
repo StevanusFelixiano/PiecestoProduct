@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WorkoutPlanView: View {
-    
+    @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     
     @AppStorage("textScale") private var textScale = 1.0
@@ -17,7 +17,8 @@ struct WorkoutPlanView: View {
     
     var onBackTap: () -> Void = {}
     
-    let energyState: EnergyState
+    @Binding var energyState: EnergyState
+
     @State private var selectedVideo: WorkoutVideo?
     
     private var isDark: Bool {
@@ -60,10 +61,16 @@ struct WorkoutPlanView: View {
             }
         }
         .onAppear {
-            // When the view appears, grab a random video matching the user's energy!
             if selectedVideo == nil {
                 selectedVideo = WorkoutData.getRandomVideo(for: energyState)
             }
+        }
+        .onChange(of: energyState) { oldState,
+            newState in
+            print(
+                "WorkoutPlanView detected state shift: Recalculating recommendation cards for \(newState.title)"
+            )
+            selectedVideo = WorkoutData.getRandomVideo(for: newState)
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -73,6 +80,7 @@ struct WorkoutPlanView: View {
         VStack(spacing: 0) {
             headerArea
                 .frame(height: 240)
+                .padding(.bottom, 24)
             
             VStack(spacing: 34) {
                 VStack(spacing: 32) {
@@ -121,6 +129,7 @@ struct WorkoutPlanView: View {
         .background {
             backgroundView
         }
+        .ignoresSafeArea(edges: .top)
     }
     
     private var headerArea: some View {
@@ -129,47 +138,59 @@ struct WorkoutPlanView: View {
                 content: HeaderContent(
                     title: "WORKOUT PLAN",
                     subtitle: "",
-                    description: "We've got you, Mama. Leave the planning to us!"
-                )
+                    description: "Leave the planning to us!"
+                ),
+                flowerOffset: CGSize(width: 80, height: 115)
             )
             .frame(height: 240)
             .onTapGesture {
                 onBackTap()
             }
             HStack{
+                Spacer()
+                    .frame(width: 140)
                 Button{
                     onBackTap()
                 } label:{
-                    Image(systemName: "chevron.left")
-                    .font(.system(size: 22, weight: .bold))
-                    .foregroundStyle(.black)
-                    .frame(width: 44, height: 44)
-                    .background(Color.white)
-                    .clipShape(Circle())
-                    .shadow(color: .black.opacity(0.06), radius: 4, y: 2)
+                    Image(systemName: "chevron.up")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 75, height: 38)
+                        .background(
+                            isDark
+                            ? Color.white.opacity(0.20)
+                            : Color(red: 0.980, green: 0.604, blue: 0.541)
+                        )
+                        .clipShape(Capsule())
+                        .overlay {
+                            Capsule()
+                                .stroke(.white.opacity(0.35), lineWidth: 1)
+                        }
+                        .shadow(
+                            color: isDark
+                            ? Color.black.opacity(0.25)
+                            : Color.black.opacity(0.12),
+                            radius: 6,
+                            y: 3
+                        )
                 }
+                .buttonStyle(.plain)
+                
                 Spacer()
                 
                 Button {
-                    withAnimation(
-                        .spring(response: 0.3, dampingFraction: 0.85)
-                    ) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
                         showSettings = true
                     }
                 } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundStyle(.black)
-                        .frame(width: 44, height: 44)
-                        .background(.white)
-                        .clipShape(Circle())
+                    MenuButton()
                 }
+                .buttonStyle(.plain)
+                .opacity(showSettings ? 0 : 1)
+                .allowsHitTesting(!showSettings)
             }
+            .padding (.top, 60)
             .padding(.horizontal, 20)
-            .padding(.top, 60)
-            .buttonStyle(.plain)
-            .opacity(showSettings ? 0 : 1)
-            .allowsHitTesting(!showSettings)
         }
     }
     
@@ -189,7 +210,7 @@ struct WorkoutPlanView: View {
                     maxHeight: .infinity,
                     alignment: .bottomTrailing
                 )
-                .offset(x: -208, y: 7)
+                .offset(x: -208, y: 15)
                 .opacity(1.1)
                 .ignoresSafeArea()
             
@@ -260,6 +281,8 @@ struct WorkoutPlanRow: View {
 
 #Preview {
     AppThemeManager {
-        WorkoutPlanView(energyState: .findingRhythm)
+        WorkoutPlanView(
+            onBackTap: {},
+            energyState: .constant(.findingRhythm))
     }
 }
